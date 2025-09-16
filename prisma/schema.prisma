@@ -1,0 +1,183 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  role      UserRole @default(CLAIMANT)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  claims           ForestRightsClaim[]
+  documents        ClaimDocument[]
+  workflowActions  ClaimWorkflow[]
+  auditLogs        AuditTrail[]
+
+  @@map("users")
+}
+
+model ForestRightsClaim {
+  id                String      @id @default(cuid())
+  claimNumber       String      @unique
+  claimantName      String
+  villageName       String
+  district          String
+  state             String
+  forestAreaHectares Float
+  claimType         ClaimType
+  status            ClaimStatus @default(SUBMITTED)
+  submissionDate    DateTime    @default(now())
+  lastUpdated       DateTime    @updatedAt
+  
+  // Relations
+  userId            String
+  user              User                @relation(fields: [userId], references: [id])
+  documents         ClaimDocument[]
+  spatialBoundaries SpatialBoundary[]
+  workflows         ClaimWorkflow[]
+  decisionFactors   DecisionFactor[]
+  blockchainRecords BlockchainRecord[]
+  auditLogs         AuditTrail[]
+
+  @@map("forest_rights_claims")
+}
+
+model ClaimDocument {
+  id               String           @id @default(cuid())
+  filename         String
+  fileType         String
+  fileSize         Int
+  uploadDate       DateTime         @default(now())
+  ocrText          String?
+  extractedEntities Json?
+  verificationStatus DocumentStatus @default(PENDING)
+  
+  // Relations
+  claimId          String
+  claim            ForestRightsClaim @relation(fields: [claimId], references: [id])
+  uploadedById     String
+  uploadedBy       User             @relation(fields: [uploadedById], references: [id])
+
+  @@map("claim_documents")
+}
+
+model SpatialBoundary {
+  id          String   @id @default(cuid())
+  boundaryType String
+  geoJsonData Json
+  area        Float?
+  createdAt   DateTime @default(now())
+  
+  // Relations
+  claimId     String
+  claim       ForestRightsClaim @relation(fields: [claimId], references: [id])
+
+  @@map("spatial_boundaries")
+}
+
+model ClaimWorkflow {
+  id          String       @id @default(cuid())
+  stage       WorkflowStage
+  status      String
+  comments    String?
+  processedAt DateTime     @default(now())
+  
+  // Relations
+  claimId     String
+  claim       ForestRightsClaim @relation(fields: [claimId], references: [id])
+  officialId  String
+  official    User         @relation(fields: [officialId], references: [id])
+
+  @@map("claim_workflow")
+}
+
+model DecisionFactor {
+  id                String   @id @default(cuid())
+  factorType        String
+  factorValue       Float
+  confidence        Float
+  reasoning         String?
+  calculatedAt      DateTime @default(now())
+  
+  // Relations
+  claimId           String
+  claim             ForestRightsClaim @relation(fields: [claimId], references: [id])
+
+  @@map("decision_factors")
+}
+
+model BlockchainRecord {
+  id              String   @id @default(cuid())
+  transactionHash String   @unique
+  blockNumber     Int?
+  eventType       String
+  eventData       Json
+  timestamp       DateTime @default(now())
+  
+  // Relations
+  claimId         String
+  claim           ForestRightsClaim @relation(fields: [claimId], references: [id])
+
+  @@map("blockchain_records")
+}
+
+model AuditTrail {
+  id          String   @id @default(cuid())
+  action      String
+  tableName   String
+  recordId    String
+  oldValues   Json?
+  newValues   Json?
+  timestamp   DateTime @default(now())
+  
+  // Relations
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  claimId     String?
+  claim       ForestRightsClaim? @relation(fields: [claimId], references: [id])
+
+  @@map("audit_trail")
+}
+
+// Enums
+enum UserRole {
+  CLAIMANT
+  OFFICIAL
+  ADMIN
+}
+
+enum ClaimType {
+  INDIVIDUAL
+  COMMUNITY
+  TRADITIONAL
+}
+
+enum ClaimStatus {
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  PENDING_DOCUMENTS
+}
+
+enum DocumentStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum WorkflowStage {
+  INITIAL_REVIEW
+  FIELD_VERIFICATION
+  LEGAL_REVIEW
+  FINAL_DECISION
+}
