@@ -1,108 +1,190 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Bell, Menu, User, LogOut } from "lucide-react"
-import { useEffect, useState } from "react"
-import type { User as UserType } from "@/lib/auth"
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import {
+  Menu,
+  User,
+  LogOut,
+  Settings,
+  HelpCircle,
+  Home,
+  FileText,
+  Map,
+  BarChart3,
+} from "lucide-react";
+import { useAppSelector, useAppDispatch } from "@/lib/store/hooks";
+import {
+  useGetCurrentUserQuery,
+  useLogoutMutation,
+} from "@/lib/store/api/authApi";
+import { logout } from "@/lib/store/slices/authSlice";
+import { GlobalSearch } from "@/components/search/global-search";
+import { NotificationCenter } from "@/components/notifications/notification-center";
+import Link from "next/link";
+import { useRouter, usePathname } from "next/navigation";
+import { toast } from "sonner";
 
 export function DashboardHeader() {
-  const [user, setUser] = useState<UserType | null>(null)
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+  const pathname = usePathname();
 
-  useEffect(() => {
-    async function fetchUser() {
-      try {
-        const response = await fetch("/api/auth/me")
-        const result = await response.json()
-        if (result.success) {
-          setUser(result.user)
-        }
-      } catch (error) {
-        console.error("Failed to fetch user:", error)
-      }
-    }
-    fetchUser()
-  }, [])
+  const { user, isAuthenticated } = useAppSelector((state) => state.auth);
+  const { data: userData } = useGetCurrentUserQuery(undefined, {
+    skip: !isAuthenticated,
+  });
+  const [logoutMutation] = useLogoutMutation();
+
+  const currentUser = user || userData?.user;
 
   const handleLogout = async () => {
     try {
-      await fetch("/api/auth/logout", { method: "POST" })
-      window.location.href = "/login"
+      await logoutMutation().unwrap();
+      dispatch(logout());
+      toast.success("Logged out successfully");
+      router.push("/login");
     } catch (error) {
-      console.error("Logout failed:", error)
+      console.error("Logout failed:", error);
+      toast.error("Failed to logout");
     }
-  }
+  };
+
+  const isActivePath = (path: string) => {
+    return pathname === path || pathname.startsWith(path + "/");
+  };
+
+  const navItems = [
+    { href: "/", label: "Dashboard", icon: Home },
+    { href: "/claims", label: "Claims", icon: FileText },
+    { href: "/map", label: "Map", icon: Map },
+    { href: "/analytics", label: "Analytics", icon: BarChart3 },
+  ];
 
   return (
-    <header className="border-b bg-card">
-      <div className="container mx-auto px-4 py-4">
+    <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 shadow-sm">
+      <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           {/* Logo and Navigation */}
           <div className="flex items-center space-x-8">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-sm">FRA</span>
+            <Link href="/" className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                <span className="text-white font-bold text-lg">🌲</span>
               </div>
-              <span className="font-semibold text-lg">Atlas</span>
-            </div>
+              <div>
+                <span className="font-bold text-xl bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+                  FRA Atlas
+                </span>
+                <p className="text-xs text-gray-500 -mt-1">
+                  Forest Rights Management
+                </p>
+              </div>
+            </Link>
 
-            <nav className="hidden md:flex items-center space-x-6">
-              <a href="/" className="text-foreground hover:text-primary transition-colors">
-                Dashboard
-              </a>
-              <a href="/claims" className="text-muted-foreground hover:text-primary transition-colors">
-                Claims
-              </a>
-              <a href="/documents" className="text-muted-foreground hover:text-primary transition-colors">
-                Documents
-              </a>
-              <a href="/map" className="text-muted-foreground hover:text-primary transition-colors">
-                Map
-              </a>
-              <a href="/reports" className="text-muted-foreground hover:text-primary transition-colors">
-                Reports
-              </a>
+            <nav className="hidden lg:flex items-center space-x-1">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = isActivePath(item.href);
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`flex items-center space-x-2 px-3 py-2 rounded-lg font-medium transition-colors ${
+                      isActive
+                        ? "text-blue-600 bg-blue-50"
+                        : "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+                    }`}
+                  >
+                    <Icon className="h-4 w-4" />
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
             </nav>
           </div>
 
-          {/* User Actions */}
+          {/* Search and User Actions */}
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="icon">
-              <Bell className="h-5 w-5" />
-            </Button>
+            {/* Global Search */}
+            <div className="hidden md:flex">
+              <GlobalSearch />
+            </div>
 
+            {/* Notifications */}
+            <NotificationCenter />
+
+            {/* User Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback>{user?.name ? user.name.charAt(0) : <User className="h-4 w-4" />}</AvatarFallback>
+                <Button
+                  variant="ghost"
+                  className="relative h-10 w-10 rounded-full ring-2 ring-gray-200 hover:ring-blue-300"
+                >
+                  <Avatar className="h-9 w-9">
+                    <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-semibold">
+                      {currentUser?.name ? (
+                        currentUser.name.charAt(0).toUpperCase()
+                      ) : (
+                        <User className="h-4 w-4" />
+                      )}
+                    </AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                {user && (
-                  <div className="px-2 py-1.5 text-sm">
-                    <p className="font-medium">{user.name}</p>
-                    <p className="text-muted-foreground">{user.email}</p>
-                    <p className="text-xs text-muted-foreground capitalize">{user.role}</p>
+              <DropdownMenuContent className="w-64" align="end" forceMount>
+                {currentUser && (
+                  <div className="px-4 py-3 border-b">
+                    <p className="font-semibold text-gray-900">
+                      {currentUser.name || "User"}
+                    </p>
+                    <p className="text-sm text-gray-500">{currentUser.email}</p>
+                    <Badge variant="secondary" className="mt-1 text-xs">
+                      {currentUser.role?.toLowerCase().replace("_", " ")}
+                    </Badge>
                   </div>
                 )}
-                <DropdownMenuItem>Profile Settings</DropdownMenuItem>
-                <DropdownMenuItem>Help & Support</DropdownMenuItem>
-                <DropdownMenuItem onClick={handleLogout}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Sign Out
+                <DropdownMenuItem
+                  className="flex items-center space-x-2 py-3"
+                  asChild
+                >
+                  <Link href="/profile">
+                    <Settings className="h-4 w-4" />
+                    <span>Profile Settings</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="flex items-center space-x-2 py-3"
+                  asChild
+                >
+                  <Link href="/help">
+                    <HelpCircle className="h-4 w-4" />
+                    <span>Help & Support</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={handleLogout}
+                  className="flex items-center space-x-2 py-3 text-red-600 focus:text-red-600"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>Sign Out</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <Button variant="ghost" size="icon" className="md:hidden">
+            {/* Mobile Menu */}
+            <Button variant="ghost" size="icon" className="lg:hidden">
               <Menu className="h-5 w-5" />
             </Button>
           </div>
         </div>
       </div>
     </header>
-  )
+  );
 }

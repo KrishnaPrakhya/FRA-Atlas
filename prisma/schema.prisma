@@ -17,30 +17,46 @@ model User {
   updatedAt DateTime @updatedAt
 
   // Relations
-  claims           ForestRightsClaim[]
-  documents        ClaimDocument[]
-  workflowActions  ClaimWorkflow[]
-  auditLogs        AuditTrail[]
+  claims          ForestRightsClaim[]
+  documents       ClaimDocument[]
+  workflowActions ClaimWorkflow[]
+  auditLogs       AuditTrail[]
+  profile         UserProfile?
 
   @@map("users")
 }
 
+model UserProfile {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  phone     String?
+  avatar    String?
+  language  String   @default("en")
+  timezone  String   @default("Asia/Kolkata")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("user_profiles")
+}
+
 model ForestRightsClaim {
-  id                String      @id @default(cuid())
-  claimNumber       String      @unique
-  claimantName      String
-  villageName       String
-  district          String
-  state             String
-  forestAreaHectares Float
-  claimType         ClaimType
-  status            ClaimStatus @default(SUBMITTED)
-  submissionDate    DateTime    @default(now())
-  lastUpdated       DateTime    @updatedAt
-  
+  id                   String      @id @default(cuid())
+  claimNumber          String      @unique
+  claimantName         String
+  villageName          String
+  district             String
+  state                String
+  forestAreaHectares   Float
+  claimType            ClaimType
+  status               ClaimStatus @default(SUBMITTED)
+  submissionDate       DateTime    @default(now())
+  lastUpdated          DateTime    @updatedAt
+  actualCompletionDate DateTime?
+
   // Relations
   userId            String
-  user              User                @relation(fields: [userId], references: [id])
+  user              User               @relation(fields: [userId], references: [id])
   documents         ClaimDocument[]
   spatialBoundaries SpatialBoundary[]
   workflows         ClaimWorkflow[]
@@ -52,65 +68,65 @@ model ForestRightsClaim {
 }
 
 model ClaimDocument {
-  id               String           @id @default(cuid())
-  filename         String
-  fileType         String
-  fileSize         Int
-  uploadDate       DateTime         @default(now())
-  ocrText          String?
-  extractedEntities Json?
+  id                 String         @id @default(cuid())
+  filename           String
+  fileType           String
+  fileSize           Int
+  uploadDate         DateTime       @default(now())
+  ocrText            String?
+  extractedEntities  Json?
   verificationStatus DocumentStatus @default(PENDING)
-  
+
   // Relations
-  claimId          String
-  claim            ForestRightsClaim @relation(fields: [claimId], references: [id])
-  uploadedById     String
-  uploadedBy       User             @relation(fields: [uploadedById], references: [id])
+  claimId      String
+  claim        ForestRightsClaim @relation(fields: [claimId], references: [id])
+  uploadedById String
+  uploadedBy   User              @relation(fields: [uploadedById], references: [id])
 
   @@map("claim_documents")
 }
 
 model SpatialBoundary {
-  id          String   @id @default(cuid())
+  id           String   @id @default(cuid())
   boundaryType String
-  geoJsonData Json
-  area        Float?
-  createdAt   DateTime @default(now())
-  
+  geoJsonData  Json
+  area         Float?
+  createdAt    DateTime @default(now())
+
   // Relations
-  claimId     String
-  claim       ForestRightsClaim @relation(fields: [claimId], references: [id])
+  claimId String
+  claim   ForestRightsClaim @relation(fields: [claimId], references: [id])
 
   @@map("spatial_boundaries")
 }
 
 model ClaimWorkflow {
-  id          String       @id @default(cuid())
+  id          String        @id @default(cuid())
   stage       WorkflowStage
   status      String
   comments    String?
-  processedAt DateTime     @default(now())
-  
+  processedAt DateTime      @default(now())
+
   // Relations
-  claimId     String
-  claim       ForestRightsClaim @relation(fields: [claimId], references: [id])
-  officialId  String
-  official    User         @relation(fields: [officialId], references: [id])
+  claimId    String
+  claim      ForestRightsClaim @relation(fields: [claimId], references: [id])
+  officialId String
+  official   User              @relation(fields: [officialId], references: [id])
 
   @@map("claim_workflow")
 }
 
 model DecisionFactor {
-  id                String   @id @default(cuid())
-  factorType        String
-  factorValue       Float
-  confidence        Float
-  reasoning         String?
-  calculatedAt      DateTime @default(now())
-  
+  id           String   @id @default(cuid())
+  factorType   String
+  factorValue  Float
+  confidence   Float
+  reasoning    String?
+  calculatedAt DateTime @default(now())
+
   // Relations
-  claimId           String
-  claim             ForestRightsClaim @relation(fields: [claimId], references: [id])
+  claimId String
+  claim   ForestRightsClaim @relation(fields: [claimId], references: [id])
 
   @@map("decision_factors")
 }
@@ -122,28 +138,28 @@ model BlockchainRecord {
   eventType       String
   eventData       Json
   timestamp       DateTime @default(now())
-  
+
   // Relations
-  claimId         String
-  claim           ForestRightsClaim @relation(fields: [claimId], references: [id])
+  claimId String
+  claim   ForestRightsClaim @relation(fields: [claimId], references: [id])
 
   @@map("blockchain_records")
 }
 
 model AuditTrail {
-  id          String   @id @default(cuid())
-  action      String
-  tableName   String
-  recordId    String
-  oldValues   Json?
-  newValues   Json?
-  timestamp   DateTime @default(now())
-  
+  id        String   @id @default(cuid())
+  action    String
+  tableName String
+  recordId  String
+  oldValues Json?
+  newValues Json?
+  timestamp DateTime @default(now())
+
   // Relations
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  claimId     String?
-  claim       ForestRightsClaim? @relation(fields: [claimId], references: [id])
+  userId  String
+  user    User               @relation(fields: [userId], references: [id])
+  claimId String?
+  claim   ForestRightsClaim? @relation(fields: [claimId], references: [id])
 
   @@map("audit_trail")
 }

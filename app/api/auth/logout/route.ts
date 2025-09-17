@@ -1,14 +1,34 @@
-import { NextResponse } from "next/server"
-import { cookies } from "next/headers"
+import { NextRequest, NextResponse } from "next/server"
+import { withErrorHandler } from "@/lib/error-handler"
 
-export async function POST() {
+export const POST = withErrorHandler(async (request: NextRequest) => {
   try {
-    const cookieStore = await cookies()
-    cookieStore.delete("auth-token")
+    
+    // Create response
+    const response = NextResponse.json({
+      success: true,
+      message: "Successfully logged out",
+    })
 
-    return NextResponse.json({ success: true })
+    // Set cookies to expire immediately
+    response.cookies.set("auth-token", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 0,
+      path: "/",
+    })
+
+    response.cookies.set("refresh-token", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 0,
+      path: "/",
+    })
+
+    return response
   } catch (error) {
-    console.error("Logout error:", error)
-    return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 })
+    throw error
   }
-}
+})

@@ -1,77 +1,91 @@
-import { Badge } from "@/components/ui/badge"
-import { prisma } from "@/lib/prisma"
-import { formatDistanceToNow } from "date-fns"
+import { Badge } from "@/components/ui/badge";
+import { prisma } from "@/lib/prisma";
+import { formatDistanceToNow } from "date-fns";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export async function RecentClaims() {
   const claims = await prisma.forestRightsClaim.findMany({
     orderBy: { submissionDate: "desc" },
     take: 5,
-  })
+    include: {
+      user: {
+        include: {
+          profile: true,
+        },
+      },
+    },
+  });
 
-  const getStatusColor = (status: string) => {
+  const getStatusVariant = (
+    status: string
+  ): "default" | "destructive" | "secondary" | "outline" => {
     switch (status) {
       case "APPROVED":
-        return "bg-green-100 text-green-800"
+        return "default";
       case "REJECTED":
-        return "bg-red-100 text-red-800"
+        return "destructive";
       case "UNDER_REVIEW":
-        return "bg-yellow-100 text-yellow-800"
-      case "PENDING_DOCUMENTS":
-        return "bg-blue-100 text-blue-800"
+        return "secondary";
       default:
-        return "bg-gray-100 text-gray-800"
+        return "outline";
     }
-  }
+  };
 
   const formatStatus = (status: string) => {
-    return status
-      .replace("_", " ")
-      .toLowerCase()
-      .replace(/\b\w/g, (l) => l.toUpperCase())
-  }
+    return status.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+  };
 
   if (claims.length === 0) {
     return (
-      <div className="text-center py-8 text-muted-foreground">
-        <div className="space-y-2">
-          <p>No claims found.</p>
-          <p className="text-sm">Submit your first claim to get started.</p>
-        </div>
+      <div className="text-center py-10 text-muted-foreground">
+        <p className="text-lg">No recent claims found.</p>
+        <p className="text-sm">
+          New claims will appear here as they are submitted.
+        </p>
       </div>
-    )
+    );
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {claims.map((claim) => (
         <div
           key={claim.id}
-          className="flex items-center justify-between p-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-all duration-200"
+          className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
         >
-          <div className="flex-1">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-violet-500 to-indigo-500 rounded-full flex items-center justify-center shadow-lg">
-                <span className="text-white font-semibold text-sm">{claim.claimantName.charAt(0)}</span>
-              </div>
-              <div>
-                <p className="font-medium text-foreground">{claim.claimantName}</p>
-                <p className="text-sm text-muted-foreground">
-                  {claim.villageName}, {claim.district}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {formatDistanceToNow(new Date(claim.submissionDate), { addSuffix: true })}
-                </p>
-              </div>
+          <div className="flex items-center gap-4">
+            <Avatar className="h-10 w-10">
+              <AvatarImage
+                src={claim.user.profile?.avatar || ""}
+                alt={claim.claimantName}
+              />
+              <AvatarFallback>{claim.claimantName.charAt(0)}</AvatarFallback>
+            </Avatar>
+            <div className="grid gap-1">
+              <p className="text-sm font-medium leading-none">
+                {claim.claimantName}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {claim.villageName}, {claim.district} &middot;{" "}
+                {formatDistanceToNow(new Date(claim.submissionDate), {
+                  addSuffix: true,
+                })}
+              </p>
             </div>
           </div>
-          <div className="flex items-center space-x-3">
-            <Badge className={`${getStatusColor(claim.status)} backdrop-blur-sm border-0 shadow-sm`}>
+          <div className="flex items-center gap-4">
+            <Badge
+              variant={getStatusVariant(claim.status)}
+              className="capitalize"
+            >
               {formatStatus(claim.status)}
             </Badge>
-            <span className="text-sm text-muted-foreground font-mono">{claim.claimNumber}</span>
+            <span className="text-xs text-muted-foreground font-mono hidden sm:block">
+              {claim.claimNumber}
+            </span>
           </div>
         </div>
       ))}
     </div>
-  )
+  );
 }

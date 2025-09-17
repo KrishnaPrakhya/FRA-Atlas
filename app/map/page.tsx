@@ -1,101 +1,112 @@
-import { Suspense } from "react"
-import { MapContainer } from "@/components/map/map-container"
-import { MapControls } from "@/components/map/map-controls"
-import { ClaimsList } from "@/components/map/claims-list"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
+import { DashboardHeader } from "@/components/dashboard-header";
+import { Map, Layers, Navigation, BarChart3 } from "lucide-react";
+import { MapContainer } from "@/components/map/map-container";
+import { MapControls } from "@/components/map/map-controls";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export default function MapPage() {
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 space-y-6">
-        {/* Page Header */}
-        <div className="space-y-4">
-          <h1 className="text-3xl font-bold text-balance">WebGIS Mapping Platform</h1>
-          <p className="text-lg text-muted-foreground text-pretty">
-            Interactive mapping system for forest boundaries, claim areas, and spatial analysis
-          </p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      <DashboardHeader />
+      <main className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+              <Map className="h-8 w-8 text-blue-600" />
+              Spatial Data & Mapping
+            </h1>
+            <p className="text-gray-600 mt-1">
+              Interactive map showing forest rights claims and boundaries
+            </p>
+          </div>
         </div>
 
-        {/* Map Interface */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-[calc(100vh-200px)]">
-          {/* Map Controls Sidebar */}
-          <div className="lg:col-span-1 space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Map Controls</CardTitle>
-                <CardDescription>Filter and customize map display</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Suspense fallback={<MapControlsSkeleton />}>
-                  <MapControls />
-                </Suspense>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Claims Overview</CardTitle>
-                <CardDescription>Browse claims by location</CardDescription>
-              </CardHeader>
-              <CardContent className="p-0">
-                <Suspense fallback={<ClaimsListSkeleton />}>
-                  <ClaimsList />
-                </Suspense>
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* Sidebar with Controls */}
+          <div className="lg:col-span-1">
+            <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm sticky top-8">
+              <CardContent className="p-6">
+                <MapControls />
               </CardContent>
             </Card>
           </div>
 
-          {/* Main Map */}
+          {/* Map Container */}
           <div className="lg:col-span-3">
-            <Card className="h-full">
-              <CardContent className="p-0 h-full">
+            <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm h-[800px]">
+              <CardContent className="p-0 h-full rounded-lg overflow-hidden">
                 <MapContainer />
               </CardContent>
             </Card>
           </div>
         </div>
-      </div>
-    </div>
-  )
-}
 
-// Loading skeletons
-function MapControlsSkeleton() {
-  return (
-    <div className="space-y-4">
-      <div className="space-y-2">
-        <Skeleton className="h-4 w-20" />
-        <Skeleton className="h-10 w-full" />
-      </div>
-      <div className="space-y-2">
-        <Skeleton className="h-4 w-24" />
-        <Skeleton className="h-10 w-full" />
-      </div>
-      <div className="space-y-2">
-        <Skeleton className="h-4 w-16" />
-        <div className="space-y-1">
-          <Skeleton className="h-6 w-full" />
-          <Skeleton className="h-6 w-full" />
-          <Skeleton className="h-6 w-full" />
-        </div>
-      </div>
-    </div>
-  )
-}
+        {/* Map Statistics */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8">
+          <Card className="shadow-lg border-0 bg-gradient-to-br from-green-400 to-green-600 text-white">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-green-100 text-sm">Active Claims</p>
+                  <p className="text-2xl font-bold">1,234</p>
+                </div>
+                <div className="w-12 h-12 bg-green-300 bg-opacity-30 rounded-lg flex items-center justify-center">
+                  <BarChart3 className="h-6 w-6 text-white" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-function ClaimsListSkeleton() {
-  return (
-    <div className="space-y-2 p-4">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <div key={i} className="flex items-center space-x-3 p-2">
-          <Skeleton className="h-8 w-8 rounded-full" />
-          <div className="space-y-1 flex-1">
-            <Skeleton className="h-3 w-24" />
-            <Skeleton className="h-2 w-16" />
-          </div>
+          <Card className="shadow-lg border-0 bg-gradient-to-br from-blue-400 to-blue-600 text-white">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-blue-100 text-sm">Total Area</p>
+                  <p className="text-2xl font-bold">2,847 km²</p>
+                </div>
+                <div className="w-12 h-12 bg-blue-300 bg-opacity-30 rounded-lg flex items-center justify-center">
+                  <Map className="h-6 w-6 text-white" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-lg border-0 bg-gradient-to-br from-purple-400 to-purple-600 text-white">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-purple-100 text-sm">Forest Regions</p>
+                  <p className="text-2xl font-bold">156</p>
+                </div>
+                <div className="w-12 h-12 bg-purple-300 bg-opacity-30 rounded-lg flex items-center justify-center">
+                  <Layers className="h-6 w-6 text-white" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-lg border-0 bg-gradient-to-br from-orange-400 to-orange-600 text-white">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-orange-100 text-sm">Villages</p>
+                  <p className="text-2xl font-bold">892</p>
+                </div>
+                <div className="w-12 h-12 bg-orange-300 bg-opacity-30 rounded-lg flex items-center justify-center">
+                  <Navigation className="h-6 w-6 text-white" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
-      ))}
+      </main>
     </div>
-  )
+  );
 }
