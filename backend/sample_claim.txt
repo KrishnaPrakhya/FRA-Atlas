@@ -1,0 +1,55 @@
+                        FOREST RIGHTS CLAIM APPLICATION
+                        Form-A [See Rule 6(1)]
+---------------------------------------------------------------------------
+
+Application No: FRA/2025/JH/0042                        Date: 15/09/2025
+
+1. CLAIMANT DETAILS:
+   Name: Rajesh Kumar Singh
+   Village: Sonpur Gram
+   District: East Singhbhum
+   State: Jharkhand
+   Phone: +91 9876543210
+
+2. LAND DETAILS:
+   Total Area Claimed: 2.5 hectares
+   Survey Number: S.No. 245/B-12
+   Location: Adjacent to North Forest Range
+   Distance from Forest: 1.2 km
+
+3. OCCUPANCY DETAILS:
+   Years of Traditional Use: 25 years
+   Family Size: 4 members
+   Current Land Use: Agricultural
+   Season of Application: Winter
+
+4. VERIFICATION:
+   Gram Sabha Resolution No: GS/2025/42
+   Community Support Score: 85%
+   Environmental Assessment: Minimal Impact
+   Previous Forest Violations: None
+
+5. DOCUMENTATION CHECKLIST:
+   [✓] Proof of Identity
+   [✓] Proof of Residence
+   [✓] Traditional Use Evidence
+   [✓] Gram Sabha Recommendation
+   [✓] Satellite Images
+   [✓] Land Survey Report
+
+6. DECLARATION:
+   I hereby declare that the information provided above is true to my
+   knowledge and I am eligible for forest rights under the Forest Rights
+   Act, 2006.
+
+Signature: ________________
+Date: 15/09/2025
+
+---------------------------------------------------------------------------
+FOR OFFICE USE ONLY:
+
+Received By: R.K. Sharma
+Designation: Forest Rights Officer
+Receipt No: REC/2025/1234
+Legal Compliance Score: 0.82
+Documentation Score: 0.78

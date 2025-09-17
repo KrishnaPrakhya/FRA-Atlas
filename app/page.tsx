@@ -98,11 +98,17 @@ export default function HomePage() {
               <a href="/documents/processing">
                 <Button
                   variant="outline"
-                  className="w-full h-24 flex flex-col items-center justify-center gap-2 hover:bg-blue-50 transition-colors group"
+                  className="w-full h-24 flex flex-col items-center justify-center gap-2 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 transition-all group border-2 border-blue-200"
                 >
-                  <Zap className="w-8 h-8 text-blue-600 group-hover:text-blue-700" />
+                  <div className="flex items-center space-x-1">
+                    <Zap className="w-6 h-6 text-blue-600 group-hover:text-blue-700" />
+                    <Brain className="w-6 h-6 text-purple-600 group-hover:text-purple-700" />
+                  </div>
                   <span className="font-semibold text-blue-600 group-hover:text-blue-700">
-                    OCR Processing
+                    AI Analysis
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    OCR + DSS
                   </span>
                 </Button>
               </a>

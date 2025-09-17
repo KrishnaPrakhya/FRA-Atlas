@@ -13,6 +13,7 @@ from pydantic import BaseModel
 from datetime import datetime
 import uuid
 import json
+from dss_service import dss_service, ClaimData
 # Optional PDF processing
 try:
     import fitz  # PyMuPDF for PDF processing
@@ -434,3 +435,157 @@ async def get_supported_languages():
         "language_names": {code: language_info.get(code, code) for code in SUPPORTED_LANGUAGES},
         "total_count": len(SUPPORTED_LANGUAGES)
     }
+
+@app.post("/analyze-claim")
+async def analyze_claim_with_ocr(file: UploadFile = File(...)):
+    """
+    Complete claim analysis: OCR + DSS recommendation
+    """
+    start_time = datetime.now()
+    document_id = str(uuid.uuid4())
+    
+    try:
+        # Send initial status
+        await manager.send_status_update(document_id, ProcessingStatus(
+            document_id=document_id,
+            status="processing",
+            progress=10,
+            message="Starting comprehensive claim analysis...",
+            estimated_completion=45
+        ))
+        
+        # Step 1: OCR Processing
+        await manager.send_status_update(document_id, ProcessingStatus(
+            document_id=document_id,
+            status="processing",
+            progress=20,
+            message="Extracting text and entities from document...",
+            estimated_completion=35
+        ))
+        
+        # Perform OCR (reuse existing logic)
+        contents = await file.read()
+        
+        if file.content_type == "application/pdf":
+            if not PDF_SUPPORT:
+                raise HTTPException(
+                    status_code=400, 
+                    detail="PDF processing not available. Please install PyMuPDF: pip install PyMuPDF==1.23.14"
+                )
+            images = convert_pdf_to_images(contents)
+            if not images:
+                raise HTTPException(status_code=400, detail="No pages found in PDF")
+            image_np = images[0]
+        else:
+            try:
+                image = Image.open(io.BytesIO(contents)).convert("RGB")
+                image_np = np.array(image)
+            except Exception as e:
+                raise HTTPException(status_code=400, detail=f"Error processing image: {str(e)}")
+        
+        # Preprocess and perform OCR
+        image_cv = cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR)
+        enhanced_image = preprocess_image(image_cv)
+        ocr_results = reader.readtext(enhanced_image)
+        
+        # Extract text and entities
+        extracted_text = " ".join([text for _, text, _ in ocr_results])
+        entities = extract_entities_with_ner(extracted_text)
+        
+        # Create OCR result
+        ocr_result = {
+            'id': str(uuid.uuid4()),
+            'document_id': document_id,
+            'extracted_text': extracted_text,
+            'confidence': np.mean([conf for _, _, conf in ocr_results]) if ocr_results else 0.0,
+            'entities': [entity.dict() for entity in entities],
+            'status': 'completed'
+        }
+        
+        # Step 2: DSS Analysis
+        await manager.send_status_update(document_id, ProcessingStatus(
+            document_id=document_id,
+            status="processing",
+            progress=60,
+            message="Analyzing claim with AI decision support...",
+            estimated_completion=15
+        ))
+        
+        # Extract features from OCR and create claim data
+        ocr_features = dss_service.extract_features_from_ocr(ocr_result)
+        
+        # Create ClaimData object
+        claim_data = ClaimData(
+            area_claimed=ocr_features.get('area_claimed', 2.0),
+            family_size=ocr_features.get('family_size', 4),
+            years_of_use=ocr_features.get('years_of_use', 20.0),
+            documentation_score=ocr_features.get('documentation_score', 0.7),
+            community_support=ocr_features.get('community_support', 0.8),
+            environmental_impact=ocr_features.get('environmental_impact', 0.3),
+            legal_compliance=ocr_features.get('legal_compliance', 0.8),
+            distance_to_forest=ocr_features.get('distance_to_forest', 2.0),
+            previous_violations=ocr_features.get('previous_violations', 0),
+            land_type=ocr_features.get('land_type', 'agricultural'),
+            state=ocr_features.get('state', 'Jharkhand'),
+            season_applied=ocr_features.get('season_applied', 'winter'),
+            claimant_name=ocr_features.get('claimant_name'),
+            village=ocr_features.get('village'),
+            district=ocr_features.get('district'),
+            claim_id=document_id
+        )
+        
+        # Get DSS recommendation
+        dss_recommendation = dss_service.analyze_claim(claim_data, ocr_result)
+        
+        await manager.send_status_update(document_id, ProcessingStatus(
+            document_id=document_id,
+            status="processing",
+            progress=90,
+            message="Finalizing comprehensive analysis...",
+            estimated_completion=3
+        ))
+        
+        # Calculate total processing time
+        total_processing_time = (datetime.now() - start_time).total_seconds()
+        
+        # Combine results
+        complete_analysis = {
+            'analysis_id': str(uuid.uuid4()),
+            'document_id': document_id,
+            'ocr_result': ocr_result,
+            'dss_recommendation': dss_recommendation,
+            'total_processing_time': total_processing_time,
+            'status': 'completed',
+            'created_at': start_time.isoformat()
+        }
+        
+        await manager.send_status_update(document_id, ProcessingStatus(
+            document_id=document_id,
+            status="completed",
+            progress=100,
+            message="Comprehensive analysis completed successfully!",
+            estimated_completion=0
+        ))
+        
+        return complete_analysis
+        
+    except Exception as e:
+        await manager.send_status_update(document_id, ProcessingStatus(
+            document_id=document_id,
+            status="failed",
+            progress=0,
+            message=f"Analysis failed: {str(e)}",
+            estimated_completion=0
+        ))
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/dss/analyze")
+async def analyze_claim_dss_only(claim_data: ClaimData):
+    """
+    DSS analysis only (without OCR)
+    """
+    try:
+        recommendation = dss_service.analyze_claim(claim_data)
+        return recommendation
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"DSS analysis failed: {str(e)}")

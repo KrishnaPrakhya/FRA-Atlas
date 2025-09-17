@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { DocumentUploader } from "@/components/documents/document-uploader";
 import { OCRResultsDisplay } from "@/components/documents/ocr-results-display";
+import { IntegratedAnalysis } from "@/components/documents/integrated-analysis";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,7 @@ import {
   Download,
   Share,
 } from "lucide-react";
+import { DashboardHeader } from "@/components/dashboard-header";
 
 interface ProcessedDocument {
   id: string;
@@ -34,7 +36,7 @@ export default function DocumentProcessingPage() {
   >([]);
   const [selectedDocument, setSelectedDocument] =
     useState<ProcessedDocument | null>(null);
-  const [activeTab, setActiveTab] = useState("upload");
+  const [activeTab, setActiveTab] = useState("integrated");
 
   const handleFilesUploaded = (files: any[]) => {
     const newDocs = files.map((file) => ({
@@ -141,6 +143,7 @@ export default function DocumentProcessingPage() {
   return (
     <div className="container mx-auto py-8 space-y-8">
       {/* Header */}
+      <DashboardHeader />
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Document Processing Center</h1>
@@ -227,20 +230,50 @@ export default function DocumentProcessingPage() {
         onValueChange={setActiveTab}
         className="space-y-6"
       >
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger
+            value="integrated"
+            className="flex items-center space-x-2"
+          >
+            <Brain className="h-4 w-4" />
+            <span>AI Analysis</span>
+          </TabsTrigger>
           <TabsTrigger value="upload" className="flex items-center space-x-2">
             <Zap className="h-4 w-4" />
-            <span>Upload & Process</span>
+            <span>OCR Only</span>
           </TabsTrigger>
           <TabsTrigger value="results" className="flex items-center space-x-2">
             <Eye className="h-4 w-4" />
             <span>View Results</span>
           </TabsTrigger>
           <TabsTrigger value="demo" className="flex items-center space-x-2">
-            <Brain className="h-4 w-4" />
-            <span>Live Demo</span>
+            <FileText className="h-4 w-4" />
+            <span>Demo</span>
           </TabsTrigger>
         </TabsList>
+
+        {/* Integrated Analysis Tab */}
+        <TabsContent value="integrated" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Brain className="h-5 w-5" />
+                <span>Complete AI-Powered Analysis</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="mb-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
+                <p className="text-sm text-blue-800">
+                  <strong>Advanced Analysis:</strong> Upload forest rights
+                  documents for comprehensive processing that combines OCR text
+                  extraction, entity recognition, and AI-powered decision
+                  support with risk assessment and precedent analysis.
+                </p>
+              </div>
+              <IntegratedAnalysis />
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         {/* Upload Tab */}
         <TabsContent value="upload" className="space-y-6">
