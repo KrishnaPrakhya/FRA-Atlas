@@ -147,7 +147,7 @@ export default function DocumentProcessingPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Document Processing Center</h1>
-          <p className="text-muted-foreground mt-2">
+          <p className="text-gray-600 dark:text-gray-300 mt-2">
             Advanced OCR and NER processing for forest rights documents
           </p>
         </div>
@@ -173,7 +173,7 @@ export default function DocumentProcessingPage() {
                 <div className="text-2xl font-bold">
                   {processedDocuments.length}
                 </div>
-                <div className="text-sm text-muted-foreground">
+                <div className="text-sm text-gray-600 dark:text-gray-300">
                   Total Documents
                 </div>
               </div>
@@ -187,7 +187,9 @@ export default function DocumentProcessingPage() {
               <CheckCircle className="h-8 w-8 text-green-600" />
               <div>
                 <div className="text-2xl font-bold">{completedDocs.length}</div>
-                <div className="text-sm text-muted-foreground">Completed</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300">
+                  Completed
+                </div>
               </div>
             </div>
           </CardContent>
@@ -201,7 +203,9 @@ export default function DocumentProcessingPage() {
                 <div className="text-2xl font-bold">
                   {processingDocs.length}
                 </div>
-                <div className="text-sm text-muted-foreground">Processing</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300">
+                  Processing
+                </div>
               </div>
             </div>
           </CardContent>
@@ -215,7 +219,7 @@ export default function DocumentProcessingPage() {
                 <div className="text-2xl font-bold">
                   {(totalConfidence * 100).toFixed(1)}%
                 </div>
-                <div className="text-sm text-muted-foreground">
+                <div className="text-sm text-gray-600 dark:text-gray-300">
                   Avg Confidence
                 </div>
               </div>
@@ -310,7 +314,7 @@ export default function DocumentProcessingPage() {
                         <FileText className="h-5 w-5 text-gray-400" />
                         <div>
                           <div className="font-medium">{doc.filename}</div>
-                          <div className="text-sm text-muted-foreground">
+                          <div className="text-sm text-gray-600 dark:text-gray-300">
                             {doc.processingTime &&
                               `Processed in ${doc.processingTime.toFixed(2)}s`}
                           </div>
@@ -373,7 +377,7 @@ export default function DocumentProcessingPage() {
                 <h3 className="text-lg font-semibold mb-2">
                   No Results Selected
                 </h3>
-                <p className="text-muted-foreground">
+                <p className="text-gray-600 dark:text">
                   Upload and process documents to view OCR results, or select a
                   completed document from the processing queue.
                 </p>
@@ -381,8 +385,6 @@ export default function DocumentProcessingPage() {
             </Card>
           )}
         </TabsContent>
-
-        {/* Demo Tab */}
         <TabsContent value="demo" className="space-y-6">
           <Card>
             <CardHeader>

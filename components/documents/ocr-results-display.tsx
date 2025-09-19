@@ -432,7 +432,7 @@ export function OCRResultsDisplay({
               <CardContent>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-sm text-gray-600 dark:text-gray-300">
                       Processing Time
                     </span>
                     <span className="font-medium">
@@ -441,7 +441,7 @@ export function OCRResultsDisplay({
                   </div>
                   <Separator />
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-sm text-gray-600 dark:text-gray-300">
                       Characters Extracted
                     </span>
                     <span className="font-medium">
@@ -450,7 +450,7 @@ export function OCRResultsDisplay({
                   </div>
                   <Separator />
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-sm text-gray-600 dark:text-gray-300">
                       Words Extracted
                     </span>
                     <span className="font-medium">
@@ -459,7 +459,7 @@ export function OCRResultsDisplay({
                   </div>
                   <Separator />
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-sm text-gray-600 dark:text-gray-300">
                       Entities per Word
                     </span>
                     <span className="font-medium">

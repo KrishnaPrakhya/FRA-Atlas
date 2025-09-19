@@ -76,10 +76,10 @@ export async function DashboardStats() {
         return (
           <Card
             key={index}
-            className="relative overflow-hidden border-0 shadow-xl bg-white/80 backdrop-blur-sm hover:shadow-2xl transition-all duration-300 hover:scale-105"
+            className="relative overflow-hidden border border-gray-200/50 dark:border-gray-700/50 shadow-lg bg-white dark:bg-gray-800 hover:shadow-xl transition-all duration-300 hover:scale-105"
           >
             <div
-              className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-5`}
+              className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-5 dark:opacity-10`}
             />
             <CardContent className="relative p-6">
               <div className="flex items-center justify-between mb-4">
@@ -91,8 +91,8 @@ export async function DashboardStats() {
                 <div
                   className={`flex items-center space-x-1 text-sm font-medium ${
                     stat.changeType === "increase"
-                      ? "text-green-600"
-                      : "text-red-600"
+                      ? "text-green-600 dark:text-green-400"
+                      : "text-red-600 dark:text-red-400"
                   }`}
                 >
                   <TrendingUp
@@ -104,13 +104,15 @@ export async function DashboardStats() {
                 </div>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
                   {stat.title}
                 </p>
-                <p className="text-3xl font-bold text-gray-900">
+                <p className="text-3xl font-bold text-gray-900 dark:text-white">
                   {stat.value.toLocaleString()}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">vs last month</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  vs last month
+                </p>
               </div>
             </CardContent>
           </Card>

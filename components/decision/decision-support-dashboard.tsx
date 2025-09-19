@@ -159,7 +159,7 @@ export function DecisionSupportDashboard({
                 <h2 className="text-xl font-bold">
                   AI Decision Recommendation
                 </h2>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-gray-600 dark:text-gray-300">
                   Analysis completed at{" "}
                   {new Date(recommendation.createdAt).toLocaleString()}
                 </p>
@@ -174,7 +174,9 @@ export function DecisionSupportDashboard({
               >
                 {(recommendation.confidence * 100).toFixed(1)}%
               </div>
-              <div className="text-sm text-muted-foreground">Confidence</div>
+              <div className="text-sm text-gray-600 dark:text-gray-300">
+                Confidence
+              </div>
             </div>
           </div>
         </CardHeader>
@@ -186,7 +188,7 @@ export function DecisionSupportDashboard({
                 <Badge className={actionConfig_item.color} variant="outline">
                   {actionConfig_item.label}
                 </Badge>
-                <p className="text-sm text-muted-foreground mt-1">
+                <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
                   Recommended action based on analysis
                 </p>
               </div>
@@ -198,13 +200,15 @@ export function DecisionSupportDashboard({
                 >
                   {riskScore.toFixed(1)}/4
                 </div>
-                <div className="text-xs text-muted-foreground">Risk Score</div>
+                <div className="text-xs text-gray-600 dark:text-gray-300">
+                  Risk Score
+                </div>
               </div>
               <div className="text-center">
                 <div className="text-lg font-bold text-blue-600">
                   {recommendation.precedentCases.length}
                 </div>
-                <div className="text-xs text-muted-foreground">
+                <div className="text-xs text-gray-600 dark:text-gray-300">
                   Similar Cases
                 </div>
               </div>
@@ -320,7 +324,7 @@ export function DecisionSupportDashboard({
                     <div className="text-2xl font-bold text-blue-600">
                       {recommendation.precedentCases.length}
                     </div>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-sm text-gray-600 dark:text-gray-300">
                       Similar Cases
                     </div>
                   </div>
@@ -339,7 +343,7 @@ export function DecisionSupportDashboard({
                         : 0}
                       %
                     </div>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-sm text-gray-600 dark:text-gray-300">
                       Avg Similarity
                     </div>
                   </div>
@@ -415,7 +419,7 @@ export function DecisionSupportDashboard({
                               Weight: {factor.weight}
                             </Badge>
                           </div>
-                          <p className="text-sm text-muted-foreground mt-1">
+                          <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
                             {factor.description}
                           </p>
                         </div>
@@ -452,7 +456,7 @@ export function DecisionSupportDashboard({
                           {severityConfig[risk.severity].label}
                         </Badge>
                       </div>
-                      <p className="text-sm text-muted-foreground mb-3">
+                      <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
                         {risk.description}
                       </p>
                       <div className="bg-blue-50 p-3 rounded-lg">
@@ -468,7 +472,7 @@ export function DecisionSupportDashboard({
                       <div className="text-lg font-semibold">
                         {(risk.probability * 100).toFixed(0)}%
                       </div>
-                      <div className="text-sm text-muted-foreground">
+                      <div className="text-sm text-gray-600 dark:text-gray-300">
                         Probability
                       </div>
                     </div>
@@ -488,7 +492,7 @@ export function DecisionSupportDashboard({
                   <div className="flex items-start justify-between mb-3">
                     <div>
                       <h4 className="font-medium">Case #{precedent.id}</h4>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-gray-600 dark:text-gray-300">
                         {new Date(precedent.date).toLocaleDateString()}
                       </p>
                     </div>
@@ -496,14 +500,14 @@ export function DecisionSupportDashboard({
                       <div className="text-lg font-semibold text-blue-600">
                         {(precedent.similarity * 100).toFixed(1)}%
                       </div>
-                      <div className="text-sm text-muted-foreground">
+                      <div className="text-sm text-gray-600 dark:text-gray-300">
                         Similarity
                       </div>
                     </div>
                   </div>
                   <p className="text-sm mb-3">{precedent.summary}</p>
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-sm text-gray-600 dark:text-gray-300">
                       Outcome:
                     </span>
                     <Badge

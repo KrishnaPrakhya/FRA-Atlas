@@ -142,8 +142,8 @@ export default function LoginPage() {
                       OFFICIAL
                     </Badge>
                   </div>
-                  <p className="text-sm text-gray-300">official@fra.gov.in</p>
-                  <p className="text-xs text-gray-400">Password: password123</p>
+                  <p className="text-sm text-gray-300">officer@fra-atlas.gov</p>
+                  <p className="text-xs text-gray-400">Password: officer123</p>
                 </div>
                 <div className="p-3 bg-white/10 rounded-lg backdrop-blur-sm">
                   <div className="flex items-center justify-between mb-1">

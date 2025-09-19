@@ -51,7 +51,7 @@ export async function RecentClaims() {
       {claims.map((claim) => (
         <div
           key={claim.id}
-          className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
+          className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 border border-gray-200/50 dark:border-gray-700/50"
         >
           <div className="flex items-center gap-4">
             <Avatar className="h-10 w-10">
@@ -59,13 +59,15 @@ export async function RecentClaims() {
                 src={claim.user.profile?.avatar || ""}
                 alt={claim.claimantName}
               />
-              <AvatarFallback>{claim.claimantName.charAt(0)}</AvatarFallback>
+              <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                {claim.claimantName.charAt(0)}
+              </AvatarFallback>
             </Avatar>
             <div className="grid gap-1">
-              <p className="text-sm font-medium leading-none">
+              <p className="text-sm font-medium leading-none text-foreground">
                 {claim.claimantName}
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-gray-600 dark:text-gray-400">
                 {claim.villageName}, {claim.district} &middot;{" "}
                 {formatDistanceToNow(new Date(claim.submissionDate), {
                   addSuffix: true,
@@ -76,11 +78,11 @@ export async function RecentClaims() {
           <div className="flex items-center gap-4">
             <Badge
               variant={getStatusVariant(claim.status)}
-              className="capitalize"
+              className="capitalize font-medium"
             >
               {formatStatus(claim.status)}
             </Badge>
-            <span className="text-xs text-muted-foreground font-mono hidden sm:block">
+            <span className="text-xs text-gray-500 dark:text-gray-400 font-mono hidden sm:block">
               {claim.claimNumber}
             </span>
           </div>

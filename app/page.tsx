@@ -12,7 +12,15 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { FilePlus, Eye, Map, Brain, FileText, Zap } from "lucide-react";
+import {
+  FilePlus,
+  Eye,
+  Map,
+  Brain,
+  FileText,
+  Zap,
+  BarChart3,
+} from "lucide-react";
 
 export default function HomePage() {
   return (
@@ -24,7 +32,7 @@ export default function HomePage() {
             <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-5xl md:text-6xl">
               FRA Atlas Dashboard
             </h1>
-            <p className="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
+            <p className="mt-3 max-w-md mx-auto text-base text-gray-600 dark:text-gray-300 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
               Monitor, analyze, and manage forest rights claims with ease and
               precision.
             </p>
@@ -37,10 +45,10 @@ export default function HomePage() {
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             <Card className="lg:col-span-2 shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-xl">
               <CardHeader>
-                <CardTitle className="text-2xl font-bold">
+                <CardTitle className="text-2xl font-bold text-foreground">
                   Recent Claims
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-gray-600 dark:text-gray-300">
                   The latest claims submitted for review.
                 </CardDescription>
               </CardHeader>
@@ -52,10 +60,10 @@ export default function HomePage() {
             </Card>
             <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-xl">
               <CardHeader>
-                <CardTitle className="text-2xl font-bold">
+                <CardTitle className="text-2xl font-bold text-foreground">
                   Claim Status Overview
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-gray-600 dark:text-gray-300">
                   A snapshot of the current claim statuses.
                 </CardDescription>
               </CardHeader>
@@ -69,30 +77,34 @@ export default function HomePage() {
 
           <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-xl">
             <CardHeader>
-              <CardTitle className="text-2xl font-bold">
+              <CardTitle className="text-2xl font-bold text-foreground">
                 Quick Actions
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-gray-600 dark:text-gray-300">
                 Your most common tasks, just a click away.
               </CardDescription>
             </CardHeader>
             <CardContent className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-              <a href="/claims/new">
+              {/* <a href="/claims/new">
                 <Button
                   variant="outline"
                   className="w-full h-24 flex flex-col items-center justify-center gap-2 hover:bg-primary/5 transition-colors"
                 >
                   <FilePlus className="w-8 h-8 text-primary" />
-                  <span className="font-semibold">New Claim</span>
+                  <span className="font-semibold text-foreground">
+                    New Claim
+                  </span>
                 </Button>
-              </a>
+              </a> */}
               <a href="/claims">
                 <Button
                   variant="outline"
                   className="w-full h-24 flex flex-col items-center justify-center gap-2 hover:bg-primary/5 transition-colors"
                 >
                   <Eye className="w-8 h-8 text-primary" />
-                  <span className="font-semibold">View All Claims</span>
+                  <span className="font-semibold text-foreground">
+                    View All Claims
+                  </span>
                 </Button>
               </a>
               <a href="/documents/processing">
@@ -107,7 +119,7 @@ export default function HomePage() {
                   <span className="font-semibold text-blue-600 group-hover:text-blue-700">
                     AI Analysis
                   </span>
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
                     OCR + DSS
                   </span>
                 </Button>
@@ -123,13 +135,29 @@ export default function HomePage() {
                   </span>
                 </Button>
               </a>
+              <a href="/analytics">
+                <Button
+                  variant="outline"
+                  className="w-full h-24 flex flex-col items-center justify-center gap-2 hover:bg-gradient-to-r hover:from-green-50 hover:to-blue-50 transition-all group border-2 border-green-200"
+                >
+                  <BarChart3 className="w-8 h-8 text-green-600 group-hover:text-green-700" />
+                  <span className="font-semibold text-green-600 group-hover:text-green-700">
+                    Analytics
+                  </span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    Charts & Insights
+                  </span>
+                </Button>
+              </a>
               <a href="/map">
                 <Button
                   variant="outline"
                   className="w-full h-24 flex flex-col items-center justify-center gap-2 hover:bg-primary/5 transition-colors"
                 >
                   <Map className="w-8 h-8 text-primary" />
-                  <span className="font-semibold">Spatial Analysis</span>
+                  <span className="font-semibold text-foreground">
+                    Spatial Analysis
+                  </span>
                 </Button>
               </a>
             </CardContent>

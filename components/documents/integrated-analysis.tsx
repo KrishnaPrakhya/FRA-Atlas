@@ -265,16 +265,16 @@ export function IntegratedAnalysis() {
               <Brain className="h-8 w-8 text-blue-600" />
             </div>
             <div className="text-center space-y-2">
-              <h3 className="text-lg font-semibold">
+              <h3 className="text-lg font-semibold text-foreground">
                 {isDragActive
                   ? "Drop document here"
                   : "AI-Powered Claim Analysis"}
               </h3>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-gray-600 dark:text-gray-300">
                 Upload forest rights documents for comprehensive OCR + DSS
                 analysis
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 Supports images (PNG, JPG, TIFF) and PDF files
               </p>
             </div>
@@ -334,7 +334,7 @@ export function IntegratedAnalysis() {
                   </div>
                   <div>
                     <h2 className="text-xl font-bold">AI Analysis Complete</h2>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
                       Processed in{" "}
                       {analysisResult.total_processing_time.toFixed(2)}s
                     </p>
@@ -355,7 +355,7 @@ export function IntegratedAnalysis() {
                         .toUpperCase()}
                     </Badge>
                   </div>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
                     {(
                       analysisResult.dss_recommendation.confidence * 100
                     ).toFixed(1)}
@@ -389,7 +389,7 @@ export function IntegratedAnalysis() {
                           )}
                           %
                         </div>
-                        <div className="text-sm text-muted-foreground">
+                        <div className="text-sm text-gray-600 dark:text-gray-300">
                           OCR Accuracy
                         </div>
                       </div>
@@ -408,7 +408,7 @@ export function IntegratedAnalysis() {
                           ).toFixed(1)}
                           %
                         </div>
-                        <div className="text-sm text-muted-foreground">
+                        <div className="text-sm text-gray-600 dark:text-gray-300">
                           Decision Confidence
                         </div>
                       </div>
@@ -432,7 +432,7 @@ export function IntegratedAnalysis() {
                         >
                           {analysisResult.dss_recommendation.risk_level.toUpperCase()}
                         </div>
-                        <div className="text-sm text-muted-foreground">
+                        <div className="text-sm text-gray-600 dark:text-gray-300">
                           Risk Level
                         </div>
                       </div>
@@ -505,7 +505,7 @@ export function IntegratedAnalysis() {
                             <Badge className={config.color}>
                               {entity.value}
                             </Badge>
-                            <span className="text-sm text-muted-foreground">
+                            <span className="text-sm text-gray-600 dark:text-gray-300">
                               {config.label}
                             </span>
                           </div>
@@ -547,7 +547,7 @@ export function IntegratedAnalysis() {
                               {risk.severity} risk
                             </Badge>
                           </div>
-                          <p className="text-sm text-muted-foreground mb-3">
+                          <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
                             {risk.description}
                           </p>
                           <div className="bg-blue-50 p-3 rounded-lg">
@@ -616,12 +616,12 @@ export function IntegratedAnalysis() {
                             <div className="text-lg font-semibold text-blue-600">
                               {(precedent.similarity * 100).toFixed(1)}%
                             </div>
-                            <div className="text-sm text-muted-foreground">
+                            <div className="text-sm text-gray-600 dark:text-gray-300">
                               Similarity
                             </div>
                           </div>
                         </div>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-gray-600 dark:text-gray-300">
                           {precedent.summary}
                         </p>
                       </CardContent>

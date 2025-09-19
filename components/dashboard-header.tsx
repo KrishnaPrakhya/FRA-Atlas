@@ -69,8 +69,8 @@ export function DashboardHeader() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 shadow-sm">
-      <div className="container mx-auto px-4 py-3">
+    <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 shadow-sm mb-10 rounded-lg">
+      <div className="container mx-auto px-4 py-3 ">
         <div className="flex items-center justify-between">
           {/* Logo and Navigation */}
           <div className="flex items-center space-x-8">
