@@ -19,6 +19,9 @@ import {
   FileText,
   Map,
   BarChart3,
+  TreePine,
+  Sparkles,
+  Leaf,
 } from "lucide-react";
 import { useAppSelector, useAppDispatch } from "@/lib/store/hooks";
 import {
@@ -69,26 +72,32 @@ export function DashboardHeader() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 shadow-sm mb-10 rounded-lg">
-      <div className="container mx-auto px-4 py-3 ">
+    <header className="sticky top-0 z-50 w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-2xl border-b border-emerald-200/30 dark:border-emerald-700/30 shadow-xl">
+      <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          {/* Logo and Navigation */}
+          {/* Enhanced Logo and Navigation */}
           <div className="flex items-center space-x-8">
-            <Link href="/" className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold text-lg">🌲</span>
+            <Link href="/" className="flex items-center space-x-4 group">
+              <div className="relative">
+                <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-2xl group-hover:shadow-emerald-500/25 transition-all duration-300 group-hover:scale-110">
+                  <TreePine className="h-7 w-7 text-white" />
+                </div>
+                <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-full flex items-center justify-center">
+                  <Sparkles className="h-2 w-2 text-white" />
+                </div>
               </div>
               <div>
-                <span className="font-bold text-xl bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+                <span className="font-bold text-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 bg-clip-text text-transparent">
                   FRA Atlas
                 </span>
-                <p className="text-xs text-gray-500 -mt-1">
-                  Forest Rights Management
+                <p className="text-xs text-gray-600 dark:text-gray-400 -mt-1 flex items-center space-x-1">
+                  <Leaf className="h-3 w-3 text-emerald-500" />
+                  <span>Forest Rights Management</span>
                 </p>
               </div>
             </Link>
 
-            <nav className="hidden lg:flex items-center space-x-1">
+            <nav className="hidden lg:flex items-center space-x-2">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = isActivePath(item.href);
@@ -96,14 +105,24 @@ export function DashboardHeader() {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`flex items-center space-x-2 px-3 py-2 rounded-lg font-medium transition-colors ${
+                    className={`relative flex items-center space-x-2 px-4 py-3 rounded-xl font-medium transition-all duration-300 group ${
                       isActive
-                        ? "text-blue-600 bg-blue-50"
-                        : "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+                        ? "text-emerald-700 bg-gradient-to-r from-emerald-50 to-teal-50 shadow-lg border border-emerald-200/50"
+                        : "text-gray-600 dark:text-gray-300 hover:text-emerald-600 hover:bg-gradient-to-r hover:from-emerald-50/50 hover:to-teal-50/50 hover:shadow-md"
                     }`}
                   >
-                    <Icon className="h-4 w-4" />
-                    <span>{item.label}</span>
+                    {isActive && (
+                      <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 rounded-xl"></div>
+                    )}
+                    <Icon
+                      className={`h-5 w-5 transition-transform group-hover:scale-110 ${
+                        isActive ? "text-emerald-600" : ""
+                      }`}
+                    />
+                    <span className="relative z-10">{item.label}</span>
+                    {isActive && (
+                      <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-emerald-500 rounded-full"></div>
+                    )}
                   </Link>
                 );
               })}
@@ -125,17 +144,20 @@ export function DashboardHeader() {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="relative h-10 w-10 rounded-full ring-2 ring-gray-200 hover:ring-blue-300"
+                  className="relative h-12 w-12 rounded-2xl ring-2 ring-emerald-200/50 hover:ring-emerald-300 transition-all duration-300 hover:scale-105"
                 >
-                  <Avatar className="h-9 w-9">
-                    <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-semibold">
+                  <Avatar className="h-10 w-10">
+                    <AvatarFallback className="bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 text-white font-bold text-lg shadow-lg">
                       {currentUser?.name ? (
                         currentUser.name.charAt(0).toUpperCase()
                       ) : (
-                        <User className="h-4 w-4" />
+                        <User className="h-5 w-5" />
                       )}
                     </AvatarFallback>
                   </Avatar>
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full border-2 border-white flex items-center justify-center">
+                    <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                  </div>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-64" align="end" forceMount>

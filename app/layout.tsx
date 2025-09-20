@@ -8,6 +8,7 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { ReduxProvider } from "@/components/providers/redux-provider";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
+import { DashboardHeader } from "@/components/dashboard-header";
 
 export const metadata: Metadata = {
   title: "FRA Atlas - Forest Rights Act Management System",
@@ -26,6 +27,7 @@ export default function RootLayout({
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
         <ReduxProvider>
           <ErrorBoundary>
+            <DashboardHeader />
             <Suspense fallback={null}>{children}</Suspense>
             <Toaster position="top-right" />
           </ErrorBoundary>
