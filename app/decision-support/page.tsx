@@ -187,7 +187,6 @@ export default function DecisionSupportPage() {
   return (
     <div className="container mx-auto py-8 space-y-8">
       {/* Header */}
-      <DashboardHeader />
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Decision Support System</h1>
