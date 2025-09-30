@@ -39,7 +39,6 @@ export function DashboardHeader() {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const pathname = usePathname();
-
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
   const { data: userData } = useGetCurrentUserQuery(undefined, {
     skip: !isAuthenticated,
@@ -70,7 +69,7 @@ export function DashboardHeader() {
     { href: "/map", label: "Map", icon: Map },
     { href: "/analytics", label: "Analytics", icon: BarChart3 },
   ];
-
+  if (pathname === "/login") return <div></div>;
   return (
     <header className="sticky top-0 z-50 w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-2xl border-b border-emerald-200/30 dark:border-emerald-700/30 shadow-xl">
       <div className="container mx-auto px-4 py-4">

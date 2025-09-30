@@ -72,7 +72,7 @@ const uiSlice = createSlice({
       type: 'success' | 'error' | 'warning' | 'info'
       duration?: number
     }>) => {
-      state.notifications = action.payload
+      state.notifications = { ...action.payload, show: true }
     },
     hideNotification: (state) => {
       state.notifications = null

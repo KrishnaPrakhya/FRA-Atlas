@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { handleApiError } from "@/lib/error-handler";
 import { DocumentStatus } from "@prisma/client";
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status") as DocumentStatus | null;

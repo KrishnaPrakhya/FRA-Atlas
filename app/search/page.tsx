@@ -37,7 +37,7 @@ async function SearchResults({ query }: { query: string }) {
   const mockResults: SearchResult[] = [
     {
       id: "1",
-      type: "claim",
+      type: "claim" as const,
       title: "Forest Rights Claim #FRA-2024-001",
       subtitle: "Rajesh Kumar - Kanha Village, Mandla District",
       url: "/claims/1",
@@ -50,7 +50,7 @@ async function SearchResults({ query }: { query: string }) {
     },
     {
       id: "2",
-      type: "document",
+      type: "document" as const,
       title: "Identity Proof - Aadhaar Card",
       subtitle: "Document uploaded for claim FRA-2024-001",
       url: "/documents/2",
@@ -59,7 +59,7 @@ async function SearchResults({ query }: { query: string }) {
     },
     {
       id: "3",
-      type: "user",
+      type: "user" as const,
       title: "Priya Devi",
       subtitle: "Forest Official - Bandhavgarh Division",
       url: "/users/3",
@@ -72,7 +72,7 @@ async function SearchResults({ query }: { query: string }) {
     },
     {
       id: "4",
-      type: "location",
+      type: "location" as const,
       title: "Pench National Park",
       subtitle: "Protected Area - Madhya Pradesh",
       url: "/map?location=pench",
@@ -129,7 +129,7 @@ async function SearchResults({ query }: { query: string }) {
                     <p className="text-gray-600 mb-2">{result.subtitle}</p>
                     {result.metadata && (
                       <div className="flex items-center space-x-4 text-sm text-gray-500">
-                        {result.metadata.status && (
+                        {typeof result.metadata.status === "string" && (
                           <Badge
                             className={`text-xs ${
                               result.metadata.status === "APPROVED"
@@ -139,22 +139,22 @@ async function SearchResults({ query }: { query: string }) {
                                 : "bg-blue-100 text-blue-800"
                             }`}
                           >
-                            {result.metadata.status as string}
+                            {String(result.metadata.status)}
                           </Badge>
                         )}
-                        {result.metadata.area && (
-                          <span>{result.metadata.area}</span>
+                        {typeof result.metadata.area === "string" && (
+                          <span>{String(result.metadata.area)}</span>
                         )}
-                        {result.metadata.size && (
-                          <span>{result.metadata.size}</span>
+                        {typeof result.metadata.size === "string" && (
+                          <span>{String(result.metadata.size)}</span>
                         )}
-                        {result.metadata.type && (
-                          <span>{result.metadata.type}</span>
+                        {typeof result.metadata.type === "string" && (
+                          <span>{String(result.metadata.type)}</span>
                         )}
-                        {result.metadata.date && (
+                        {typeof result.metadata.date === "string" && (
                           <div className="flex items-center space-x-1">
                             <Clock className="h-3 w-3" />
-                            <span>{result.metadata.date}</span>
+                            <span>{String(result.metadata.date)}</span>
                           </div>
                         )}
                       </div>

@@ -61,7 +61,7 @@ export function GlobalSearch() {
     const mockResults: SearchResult[] = [
       {
         id: "1",
-        type: "claim",
+        type: "claim" as const,
         title: `Claim #FRA-2024-001`,
         subtitle: "Rajesh Kumar - Kanha Village, Mandla",
         url: "/claims/1",
@@ -69,7 +69,7 @@ export function GlobalSearch() {
       },
       {
         id: "2",
-        type: "document",
+        type: "document" as const,
         title: "Identity Proof - Aadhaar Card",
         subtitle: "Uploaded 2 days ago",
         url: "/documents/2",
@@ -77,7 +77,7 @@ export function GlobalSearch() {
       },
       {
         id: "3",
-        type: "user",
+        type: "user" as const,
         title: "Priya Devi",
         subtitle: "Forest Official - Bandhavgarh Division",
         url: "/users/3",
@@ -85,7 +85,7 @@ export function GlobalSearch() {
       },
       {
         id: "4",
-        type: "location",
+        type: "location" as const,
         title: "Pench National Park",
         subtitle: "Protected Area - Madhya Pradesh",
         url: "/map?location=pench",
@@ -252,17 +252,17 @@ export function GlobalSearch() {
                             </p>
                             {result.metadata && (
                               <div className="flex items-center space-x-2 mt-1">
-                                {result.metadata.area && (
+                                {typeof result.metadata.area === "string" && (
                                   <span className="text-xs text-gray-500">
                                     {result.metadata.area}
                                   </span>
                                 )}
-                                {result.metadata.type && (
+                                {typeof result.metadata.type === "string" && (
                                   <span className="text-xs text-gray-500">
                                     {result.metadata.type}
                                   </span>
                                 )}
-                                {result.metadata.size && (
+                                {typeof result.metadata.size === "string" && (
                                   <span className="text-xs text-gray-500">
                                     {result.metadata.size}
                                   </span>

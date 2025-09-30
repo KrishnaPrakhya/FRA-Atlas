@@ -84,7 +84,7 @@ const offlineSlice = createSlice({
       state.pendingActions.push(pendingAction)
     },
     removePendingAction: (state, action: PayloadAction<string>) => {
-      state.pendingActions = state.pendingActions.filter(action => action.id !== action.payload)
+      state.pendingActions = state.pendingActions.filter(pendingAction => pendingAction.id !== action.payload)
     },
     incrementRetryCount: (state, action: PayloadAction<string>) => {
       const action_item = state.pendingActions.find(a => a.id === action.payload)

@@ -16,6 +16,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 interface UploadedFile {
   id: string;
@@ -44,43 +45,7 @@ export function DocumentUploader({
   const [isProcessing, setIsProcessing] = useState(false);
   const wsRef = useRef<WebSocket | null>(null);
 
-  const onDrop = useCallback(
-    async (acceptedFiles: File[]) => {
-      const newFiles: UploadedFile[] = acceptedFiles.map((file) => ({
-        id: Math.random().toString(36).substr(2, 9),
-        file,
-        preview: file.type.startsWith("image/")
-          ? URL.createObjectURL(file)
-          : undefined,
-        status: "uploading",
-        progress: 0,
-      }));
-
-      setUploadedFiles((prev) => [...prev, ...newFiles]);
-      setIsProcessing(true);
-
-      // Process each file
-      for (const uploadedFile of newFiles) {
-        try {
-          await processFile(uploadedFile);
-        } catch (error) {
-          updateFileStatus(
-            uploadedFile.id,
-            "error",
-            0,
-            undefined,
-            error instanceof Error ? error.message : "Processing failed"
-          );
-        }
-      }
-
-      setIsProcessing(false);
-      onFilesUploaded?.(uploadedFiles);
-    },
-    [uploadedFiles, onFilesUploaded]
-  );
-
-  const processFile = async (uploadedFile: UploadedFile) => {
+  const processFile = useCallback(async (uploadedFile: UploadedFile) => {
     const formData = new FormData();
     formData.append("file", uploadedFile.file);
 
@@ -143,7 +108,43 @@ export function DocumentUploader({
     } finally {
       ws.close();
     }
-  };
+  }, []);
+
+  const onDrop = useCallback(
+    async (acceptedFiles: File[]) => {
+      const newFiles: UploadedFile[] = acceptedFiles.map((file) => ({
+        id: Math.random().toString(36).substr(2, 9),
+        file,
+        preview: file.type.startsWith("image/")
+          ? URL.createObjectURL(file)
+          : undefined,
+        status: "uploading",
+        progress: 0,
+      }));
+
+      setUploadedFiles((prev) => [...prev, ...newFiles]);
+      setIsProcessing(true);
+
+      // Process each file
+      for (const uploadedFile of newFiles) {
+        try {
+          await processFile(uploadedFile);
+        } catch (error) {
+          updateFileStatus(
+            uploadedFile.id,
+            "error",
+            0,
+            undefined,
+            error instanceof Error ? error.message : "Processing failed"
+          );
+        }
+      }
+
+      setIsProcessing(false);
+      onFilesUploaded?.(uploadedFiles);
+    },
+    [processFile]
+  );
 
   const updateFileStatus = (
     id: string,
@@ -249,10 +250,12 @@ export function DocumentUploader({
                     {/* File Preview */}
                     <div className="flex-shrink-0">
                       {uploadedFile.preview ? (
-                        <img
+                        <Image
                           src={uploadedFile.preview}
                           alt={uploadedFile.file.name}
-                          className="h-16 w-16 object-cover rounded-lg border"
+                          width={200}
+                          height={200}
+                          className="object-cover rounded-lg border"
                         />
                       ) : (
                         <div className="h-16 w-16 bg-gray-100 rounded-lg border flex items-center justify-center">

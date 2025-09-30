@@ -47,6 +47,7 @@ import {
   SortAsc,
   SortDesc,
 } from "lucide-react";
+import Link from "next/link";
 
 // Mock data for claims
 const mockClaims = [
@@ -177,7 +178,7 @@ export default function ClaimsPage() {
 
   // Filter and sort claims
   const filteredClaims = useMemo(() => {
-    let filtered = mockClaims.filter((claim) => {
+    const filtered = mockClaims.filter((claim) => {
       const matchesSearch =
         claim.claimantName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         claim.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -413,13 +414,15 @@ export default function ClaimsPage() {
                       <Download className="h-4 w-4 mr-2 text-teal-600" />
                       <span className="text-teal-700">Export</span>
                     </Button>
-                    <Button
-                      size="sm"
-                      className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-lg hover:shadow-xl transition-all duration-300"
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      New Claim
-                    </Button>
+                    <Link href="/claims/new">
+                      <Button
+                        size="sm"
+                        className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        New Claim
+                      </Button>
+                    </Link>
                   </div>
                 </div>
               </CardHeader>

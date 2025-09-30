@@ -10,12 +10,15 @@ const UPLOADS_DIR = join(cwd(), "uploads");
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+  { params }: { params: Promise<{ id: string }> }
+): Promise<NextResponse> {
   try {
+    // Await params in Next.js 15
+    const { id } = await params;
+
     // Get document from database
     const document = await prisma.claimDocument.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!document) {
@@ -31,7 +34,7 @@ export async function POST(
 
     // Update document with OCR results
     const updatedDocument = await prisma.claimDocument.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ocrText: text,
         extractedEntities: entities,
