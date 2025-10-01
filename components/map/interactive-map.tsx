@@ -1,161 +1,187 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
-import { MapContainer, TileLayer, GeoJSON, useMap } from "react-leaflet";
+import { useEffect, useMemo, useRef } from "react";
+import {
+  MapContainer,
+  TileLayer,
+  GeoJSON,
+  useMap,
+  Marker,
+  Tooltip,
+} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import type { GeoJsonObject, FeatureCollection } from "geojson";
+import type { FeatureCollection } from "geojson";
 
-// Note: Leaflet marker icons will use default styling
+// Leaflet doesn't have its icons available in React out of the box.
+// This is a common workaround.
+import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
+import "leaflet-defaulticon-compatibility";
 
-type Filters = {
-  query: string;
-  district: string;
-  status: string;
-  claimType: string;
-};
+// ############################################################################
+// TYPES
+// ############################################################################
 
 type Layers = {
-  claims: boolean;
-  boundaries: boolean;
-  assets: boolean;
+  villages: boolean;
   baseLayer: "street" | "satellite";
 };
 
 interface InteractiveMapProps {
-  filters: Filters;
   layers: Layers;
   geoData: FeatureCollection;
+  onFeatureSelect: (id: string | null) => void;
+  selectedFeatureId: string | null;
 }
 
-// Helper component to change map view
+// ############################################################################
+// MAP UTILITY COMPONENTS
+// ############################################################################
+
+// Component to dynamically change map view
 function ChangeView({ bounds }: { bounds: L.LatLngBoundsExpression }) {
   const map = useMap();
   useEffect(() => {
     if (bounds) {
-      map.fitBounds(bounds, { padding: [50, 50] });
+      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 12 });
     }
   }, [bounds, map]);
   return null;
 }
 
+// Component to add a legend to the map
+function Legend() {
+  const map = useMap();
+
+  useEffect(() => {
+    const legend = new L.Control({ position: "bottomright" });
+
+    legend.onAdd = () => {
+      const div = L.DomUtil.create("div", "info legend");
+      div.style.backgroundColor = "white";
+      div.style.padding = "10px";
+      div.style.borderRadius = "5px";
+      div.style.boxShadow = "0 0 15px rgba(0,0,0,0.2)";
+
+      const grades = [
+        { status: "High-Priority", color: "#ef4444" },
+        { status: "Medium-Priority", color: "#f59e0b" },
+        { status: "Low-Priority", color: "#22c55e" },
+      ];
+
+      let innerHTML = "<h4>Status</h4>";
+      for (let i = 0; i < grades.length; i++) {
+        innerHTML +=
+          `<i style="background:${grades[i].color}; width: 18px; height: 18px; float: left; margin-right: 8px; border-radius: 50%;"></i>` +
+          grades[i].status +
+          "<br>";
+      }
+      div.innerHTML = innerHTML;
+      return div;
+    };
+
+    legend.addTo(map);
+
+    return () => {
+      legend.remove();
+    };
+  }, [map]);
+
+  return null;
+}
+
+// ############################################################################
+// MAIN MAP COMPONENT
+// ############################################################################
+
 export default function InteractiveMap({
-  filters,
   layers,
   geoData,
+  onFeatureSelect,
+  selectedFeatureId,
 }: InteractiveMapProps) {
-  const filteredData = useMemo(() => {
-    if (!geoData || !("features" in geoData)) return null;
+  const geoJsonLayerRef = useRef<L.GeoJSON | null>(null);
 
-    const filteredFeatures = geoData.features.filter((feature) => {
-      const p = feature.properties;
-      if (filters.district !== "all" && p?.district !== filters.district)
-        return false;
-      if (filters.status !== "all" && p?.status !== filters.status)
-        return false;
-      if (filters.claimType !== "all" && p?.type !== filters.claimType)
-        return false;
-      if (
-        filters.query &&
-        !p?.name.toLowerCase().includes(filters.query.toLowerCase()) &&
-        !p?.id.toLowerCase().includes(filters.query.toLowerCase())
-      )
-        return false;
-      return true;
-    });
+  const getMarkerStyle = (status: string, isSelected: boolean) => {
+    const color =
+      status === "High-Priority"
+        ? "#ef4444"
+        : status === "Medium-Priority"
+        ? "#f59e0b"
+        : "#22c55e";
 
-    return { ...geoData, features: filteredFeatures };
-  }, [filters, geoData]);
-
-  const onEachFeature = (feature: any, layer: L.Layer) => {
-    const p = feature.properties;
-    const popupContent = `
-      <div style="font-family: sans-serif;">
-        <h3 style="margin: 0 0 5px 0; font-size: 1.1em;"><strong>${
-          p.name
-        }</strong></h3>
-        <p style="margin: 0;"><strong>ID:</strong> ${p.id}</p>
-        <p style="margin: 0;"><strong>Type:</strong> ${p.type}</p>
-        <p style="margin: 0;"><strong>Status:</strong> <span style="font-weight: bold; color: ${
-          p.status === "Approved"
-            ? "#22c55e"
-            : p.status === "Pending"
-            ? "#f59e0b"
-            : "#ef4444"
-        };">${p.status}</span></p>
-        <p style="margin: 0;"><strong>Area:</strong> ${p.area}</p>
-      </div>
-    `;
-    layer.bindPopup(popupContent);
-  };
-
-  const styleGeoJSON = (feature: any) => {
-    switch (feature.properties.status) {
-      case "Approved":
-        return {
-          color: "#22c55e",
-          weight: 2,
-          fillColor: "#22c55e",
-          fillOpacity: 0.5,
-        };
-      case "Pending":
-        return {
-          color: "#f59e0b",
-          weight: 2,
-          fillColor: "#f59e0b",
-          fillOpacity: 0.5,
-        };
-      case "Rejected":
-        return {
-          color: "#ef4444",
-          weight: 2,
-          fillColor: "#ef4444",
-          fillOpacity: 0.5,
-        };
-      default:
-        return {
-          color: "#3b82f6",
-          weight: 2,
-          fillColor: "#3b82f6",
-          fillOpacity: 0.5,
-        };
-    }
+    return {
+      fillColor: color,
+      color: isSelected ? "#000000" : "#ffffff",
+      weight: isSelected ? 3 : 1.5,
+      radius: isSelected ? 10 : 7,
+      fillOpacity: 0.9,
+    };
   };
 
   const bounds = useMemo(() => {
-    if (filteredData && filteredData.features.length > 0) {
-      return L.geoJSON(filteredData as GeoJsonObject).getBounds();
+    if (geoData && geoData.features.length > 0) {
+      // Create a temporary GeoJSON layer to calculate bounds
+      const layer = L.geoJSON(geoData as GeoJSON.GeoJsonObject);
+      return layer.getBounds();
     }
-    // Default view over Uttarakhand, India if no data
-    return L.latLngBounds(L.latLng(29.0, 78.0), L.latLng(31.5, 80.0));
-  }, [filteredData]);
+    // Default view over central India if no data
+    return L.latLngBounds(L.latLng(17, 78), L.latLng(23, 82));
+  }, [geoData]);
 
   return (
     <MapContainer
-      center={[30.3165, 78.0322]}
-      zoom={9}
+      center={[22, 82]} // Center of India
+      zoom={5}
       scrollWheelZoom={true}
       style={{ height: "100%", width: "100%", background: "#e5e7eb" }}
     >
       <ChangeView bounds={bounds} />
+      <Legend />
+
+      {/* BASE MAP TILE LAYERS */}
       {layers.baseLayer === "street" ? (
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
       ) : (
         <TileLayer
-          attribution='&copy; <a href="https://www.google.com/maps">Google Maps</a>'
-          url="http://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}"
+          attribution='© <a href="https://www.google.com/maps">Google Maps</a>'
+          url="https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
         />
       )}
 
-      {filteredData && layers.claims && (
+      {/* VILLAGES GEOJSON LAYER */}
+      {geoData && layers.villages && (
         <GeoJSON
-          key={JSON.stringify(filters)} // Force re-render on filter change
-          data={filteredData as GeoJsonObject}
-          onEachFeature={onEachFeature}
-          style={styleGeoJSON}
+          key={JSON.stringify(geoData) + selectedFeatureId} // Re-render when data or selection changes
+          ref={geoJsonLayerRef}
+          data={geoData as GeoJSON.GeoJsonObject}
+          pointToLayer={(feature, latlng) => {
+            const isSelected = feature.properties.id === selectedFeatureId;
+            return L.circleMarker(
+              latlng,
+              getMarkerStyle(feature.properties.status, isSelected)
+            );
+          }}
+          onEachFeature={(feature, layer) => {
+            layer.on({
+              click: () => {
+                onFeatureSelect(feature.properties.id);
+                // Fly to the feature on click
+                const map = (layer as any)._map;
+                if (map) {
+                  map.flyTo((layer as L.CircleMarker).getLatLng(), 12);
+                }
+              },
+            });
+            layer.bindTooltip(feature.properties.villageName, {
+              permanent: false,
+              direction: "top",
+              offset: [0, -10],
+            });
+          }}
         />
       )}
     </MapContainer>

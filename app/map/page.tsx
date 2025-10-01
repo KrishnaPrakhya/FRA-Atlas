@@ -2,8 +2,9 @@
 
 import { Suspense, useState, useEffect, useMemo, FC } from "react";
 import dynamic from "next/dynamic";
-import type { GeoJsonObject, FeatureCollection } from "geojson";
+import type { FeatureCollection } from "geojson";
 
+// ShadCN UI Components
 import {
   Card,
   CardContent,
@@ -26,6 +27,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+
+// Lucide Icons
+import {
   Search,
   Filter,
   Download,
@@ -33,182 +41,353 @@ import {
   List,
   X,
   Loader2,
+  ChevronDown,
+  MapPin,
+  Users,
+  AreaChart,
+  Target,
+  CheckCircle2,
+  Info,
+  Building2,
+  TreePine,
+  Droplets,
+  Home,
 } from "lucide-react";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import { ChevronDown } from "lucide-react";
 
 // ############################################################################
-// TYPES
+// MOCK DATA (ENHANCED) - In a real app, this would come from an API
 // ############################################################################
-type Filters = {
-  query: string;
-  district: string;
-  status: string;
-  claimType: string;
-};
 
-type Layers = {
-  claims: boolean;
-  boundaries: boolean;
-  assets: boolean;
-  baseLayer: "street" | "satellite";
-};
-
-// ############################################################################
-// MOCK GEOSPATIAL DATA (Replace with API call)
-// ############################################################################
-const MOCK_GEOJSON_DATA: FeatureCollection = {
+const MOCK_VILLAGE_GEOJSON: FeatureCollection = {
   type: "FeatureCollection",
   features: [
     {
       type: "Feature",
+      geometry: { type: "Point", coordinates: [81.8646, 23.013] },
       properties: {
-        id: "CFR/101/DEH",
-        name: "Jaunpur Forest Reserve",
-        type: "CFR",
-        status: "Approved",
-        district: "dehradun",
-        area: "150 Ha",
-      },
-      geometry: {
-        type: "Polygon",
-        coordinates: [
-          [
-            [78.0, 30.5],
-            [78.1, 30.5],
-            [78.1, 30.6],
-            [78.0, 30.6],
-            [78.0, 30.5],
-          ],
+        id: "MP_DINDORI_001",
+        villageName: "Jhirkapur",
+        state: "Madhya Pradesh",
+        district: "Dindori",
+        population: 1200,
+        tribalPopulation: 950,
+        ifrPattas: 45,
+        cfrPattas: 2,
+        totalAreaHa: 681.2,
+        assets: {
+          agriculturalLandHa: 234.5,
+          forestCoverHa: 456.7,
+          waterBodies: 4,
+          homesteads: 89,
+        },
+        eligibleSchemes: ["PM-KISAN", "Jal Jeevan Mission"],
+        priorityInterventions: [
+          "Digital Connectivity",
+          "Agricultural Extension",
         ],
+        status: "High-Priority",
       },
     },
     {
       type: "Feature",
+      geometry: { type: "Point", coordinates: [78.476, 17.3616] },
       properties: {
-        id: "IFR/23/DEH",
-        name: "Ramesh Singh",
-        type: "IFR",
-        status: "Approved",
-        district: "dehradun",
-        area: "2 Ha",
-      },
-      geometry: {
-        type: "Polygon",
-        coordinates: [
-          [
-            [78.12, 30.52],
-            [78.14, 30.52],
-            [78.14, 30.54],
-            [78.12, 30.54],
-            [78.12, 30.52],
-          ],
-        ],
+        id: "TS_ADILABAD_002",
+        villageName: "Kondapuram",
+        state: "Telangana",
+        district: "Adilabad",
+        population: 1045,
+        tribalPopulation: 789,
+        ifrPattas: 56,
+        cfrPattas: 2,
+        totalAreaHa: 700.5,
+        assets: {
+          agriculturalLandHa: 310.2,
+          forestCoverHa: 390.3,
+          waterBodies: 3,
+          homesteads: 112,
+        },
+        eligibleSchemes: ["MGNREGA", "Digital India"],
+        priorityInterventions: ["Watershed Management"],
+        status: "Medium-Priority",
       },
     },
     {
       type: "Feature",
+      geometry: { type: "Point", coordinates: [85.8245, 20.2961] },
       properties: {
-        id: "IFR/24/HAR",
-        name: "Sunita Devi",
-        type: "IFR",
-        status: "Pending",
-        district: "haridwar",
-        area: "1.5 Ha",
-      },
-      geometry: {
-        type: "Polygon",
-        coordinates: [
-          [
-            [78.15, 30.0],
-            [78.17, 30.0],
-            [78.17, 30.02],
-            [78.15, 30.02],
-            [78.15, 30.0],
-          ],
-        ],
+        id: "OD_MAYURBHANJ_003",
+        villageName: "Baripada",
+        state: "Odisha",
+        district: "Mayurbhanj",
+        population: 2500,
+        tribalPopulation: 1800,
+        ifrPattas: 120,
+        cfrPattas: 15,
+        totalAreaHa: 1250.0,
+        assets: {
+          agriculturalLandHa: 500.0,
+          forestCoverHa: 750.0,
+          waterBodies: 8,
+          homesteads: 350,
+        },
+        eligibleSchemes: ["PM-KISAN", "DAJGUA"],
+        priorityInterventions: ["Minor Forest Produce Processing"],
+        status: "Low-Priority",
       },
     },
     {
       type: "Feature",
+      geometry: { type: "Point", coordinates: [91.2778, 23.8315] },
       properties: {
-        id: "CR/05/HAR",
-        name: "Chiriakhana Grazing Land",
-        type: "CR",
-        status: "Rejected",
-        district: "haridwar",
-        area: "50 Ha",
-      },
-      geometry: {
-        type: "Polygon",
-        coordinates: [
-          [
-            [78.2, 30.1],
-            [78.3, 30.1],
-            [78.3, 30.2],
-            [78.2, 30.2],
-            [78.2, 30.1],
-          ],
-        ],
+        id: "TR_DHALAI_004",
+        villageName: "Ambassa",
+        state: "Tripura",
+        district: "Dhalai",
+        population: 850,
+        tribalPopulation: 800,
+        ifrPattas: 35,
+        cfrPattas: 5,
+        totalAreaHa: 450.0,
+        assets: {
+          agriculturalLandHa: 150.0,
+          forestCoverHa: 300.0,
+          waterBodies: 2,
+          homesteads: 60,
+        },
+        eligibleSchemes: ["Jal Jeevan Mission"],
+        priorityInterventions: ["Skill Development"],
+        status: "High-Priority",
       },
     },
   ],
 };
 
 // ############################################################################
-// 0. REAL INTERACTIVE MAP COMPONENT
-// This replaces the placeholder with a functional react-leaflet map.
+// TYPES
 // ############################################################################
+type Filters = {
+  query: string;
+  state: string;
+  district: string;
+};
 
-// Dynamic import for the map component to avoid SSR issues
+type Layers = {
+  villages: boolean;
+  boundaries: boolean;
+  assets: boolean;
+  baseLayer: "street" | "satellite";
+};
+
+type VillageProperties = {
+  id: string;
+  villageName: string;
+  state: string;
+  district: string;
+  population: number;
+  tribalPopulation: number;
+  ifrPattas: number;
+  cfrPattas: number;
+  totalAreaHa: number;
+  assets: {
+    agriculturalLandHa: number;
+    forestCoverHa: number;
+    waterBodies: number;
+    homesteads: number;
+  };
+  eligibleSchemes: string[];
+  priorityInterventions: string[];
+  status: "High-Priority" | "Medium-Priority" | "Low-Priority";
+};
+
+// ############################################################################
+// DYNAMIC MAP IMPORT
+// ############################################################################
 const DynamicMap = dynamic(() => import("@/components/map/interactive-map"), {
   ssr: false,
   loading: () => (
-    <div className="h-full flex items-center justify-center bg-muted/50">
+    <div className="h-full flex items-center justify-center bg-muted">
       <div className="text-center space-y-4">
         <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
-        <p className="text-muted-foreground">Loading Map...</p>
+        <p className="text-muted-foreground">Loading FRA Atlas...</p>
       </div>
     </div>
   ),
 });
 
 // ############################################################################
-// 1. MAP CONTAINER WRAPPER (Client Component)
-// This handles the client-side rendering check.
+// MAIN MAP PAGE COMPONENT
 // ############################################################################
-function MapContainerWrapper({
-  filters,
-  layers,
-}: {
-  filters: Filters;
-  layers: Layers;
-}) {
+export default function MapPage() {
+  const [filters, setFilters] = useState<Filters>({
+    query: "",
+    state: "all",
+    district: "all",
+  });
+
+  const [layers, setLayers] = useState<Layers>({
+    villages: true,
+    boundaries: false,
+    assets: false,
+    baseLayer: "street",
+  });
+
+  const [selectedFeatureId, setSelectedFeatureId] = useState<string | null>(
+    null
+  );
+
+  const filteredFeatures = useMemo(() => {
+    return MOCK_VILLAGE_GEOJSON.features.filter((feature) => {
+      const p = feature.properties;
+      if (filters.state !== "all" && p?.state !== filters.state) return false;
+      if (filters.district !== "all" && p?.district !== filters.district)
+        return false;
+      if (
+        filters.query &&
+        !p?.villageName.toLowerCase().includes(filters.query.toLowerCase())
+      )
+        return false;
+      return true;
+    });
+  }, [filters]);
+
+  const filteredGeoJson: FeatureCollection = {
+    type: "FeatureCollection",
+    features: filteredFeatures,
+  };
+
+  const selectedFeatureData = useMemo(() => {
+    if (!selectedFeatureId) return null;
+    const feature = MOCK_VILLAGE_GEOJSON.features.find(
+      (f) => f.properties?.id === selectedFeatureId
+    );
+    return feature?.properties as VillageProperties | null;
+  }, [selectedFeatureId]);
+
+  // Aggregate stats
+  const aggregateStats = useMemo(() => {
+    return {
+      villageCount: filteredFeatures.length,
+      totalPopulation: filteredFeatures.reduce(
+        (acc, f) => acc + (f.properties?.population || 0),
+        0
+      ),
+      totalArea: filteredFeatures.reduce(
+        (acc, f) => acc + (f.properties?.totalAreaHa || 0),
+        0
+      ),
+    };
+  }, [filteredFeatures]);
+
   return (
-    <DynamicMap filters={filters} layers={layers} geoData={MOCK_GEOJSON_DATA} />
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold tracking-tight">
+            FRA WebGIS Atlas
+          </h1>
+          <p className="text-lg text-muted-foreground">
+            Interactive Decision Support System for Forest Rights Act.
+          </p>
+        </div>
+
+        {/* STATS CARDS */}
+        <div className="grid gap-4 md:grid-cols-3 mb-6">
+          <KpiCard
+            title="Villages in View"
+            value={aggregateStats.villageCount.toLocaleString()}
+            icon={MapPin}
+          />
+          <KpiCard
+            title="Total Population"
+            value={aggregateStats.totalPopulation.toLocaleString()}
+            icon={Users}
+          />
+          <KpiCard
+            title="Total Area"
+            value={`${aggregateStats.totalArea.toFixed(2)} Ha`}
+            icon={AreaChart}
+          />
+        </div>
+
+        <div
+          className="grid grid-cols-1 lg:grid-cols-12 gap-6"
+          style={{ height: "calc(100vh - 250px)" }}
+        >
+          {/* LEFT SIDEBAR (Controls / Details) */}
+          <div className="lg:col-span-4 xl:col-span-3 h-full">
+            <Card className="h-full flex flex-col">
+              {selectedFeatureData ? (
+                <FeatureDetailPanel
+                  data={selectedFeatureData}
+                  onClose={() => setSelectedFeatureId(null)}
+                />
+              ) : (
+                <MapControls
+                  filters={filters}
+                  setFilters={setFilters}
+                  layers={layers}
+                  setLayers={setLayers}
+                  filteredFeatures={filteredFeatures}
+                />
+              )}
+            </Card>
+          </div>
+
+          {/* MAP AREA */}
+          <div className="lg:col-span-8 xl:col-span-9 h-full">
+            <Card className="h-full shadow-md">
+              <CardContent className="p-0 h-full rounded-lg overflow-hidden">
+                <DynamicMap
+                  geoData={filteredGeoJson}
+                  layers={layers}
+                  onFeatureSelect={setSelectedFeatureId}
+                  selectedFeatureId={selectedFeatureId}
+                />
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
 // ############################################################################
-// 2. MAP CONTROLS & DATA SIDEBAR (Client Component)
+// SUB-COMPONENTS
 // ############################################################################
-interface MapControlsAndDataProps {
-  filters: Filters;
-  setFilters: (filters: Filters) => void;
-  layers: Layers;
-  setLayers: (layers: Layers) => void;
+
+// KPI Card Component
+function KpiCard({
+  title,
+  value,
+  icon: Icon,
+}: {
+  title: string;
+  value: string;
+  icon: React.ElementType;
+}) {
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+        <Icon className="h-4 w-4 text-muted-foreground" />
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-bold">{value}</div>
+      </CardContent>
+    </Card>
+  );
 }
 
-function MapControlsAndData({
+// Map Controls Component
+function MapControls({
   filters,
   setFilters,
   layers,
   setLayers,
-}: MapControlsAndDataProps) {
+  filteredFeatures,
+}: any) {
   const [localQuery, setLocalQuery] = useState(filters.query);
 
   const handleFilterChange = (key: keyof Filters, value: string) => {
@@ -222,17 +401,8 @@ function MapControlsAndData({
     setLayers({ ...layers, [key]: checked });
   };
 
-  const handleBaseLayerChange = (value: "street" | "satellite") => {
-    setLayers({ ...layers, baseLayer: value });
-  };
-
   const resetFilters = () => {
-    setFilters({
-      query: "",
-      district: "all",
-      status: "all",
-      claimType: "all",
-    });
+    setFilters({ query: "", state: "all", district: "all" });
     setLocalQuery("");
   };
 
@@ -241,432 +411,306 @@ function MapControlsAndData({
     handleFilterChange("query", localQuery);
   };
 
-  useEffect(() => {
-    setLocalQuery(filters.query);
-  }, [filters.query]);
-
-  const hasActiveFilters =
-    filters.district !== "all" ||
-    filters.status !== "all" ||
-    filters.claimType !== "all" ||
-    filters.query !== "";
+  const uniqueStates = [
+    "all",
+    ...Array.from(
+      new Set(MOCK_VILLAGE_GEOJSON.features.map((f) => f.properties!.state))
+    ),
+  ];
+  const uniqueDistricts = [
+    "all",
+    ...Array.from(
+      new Set(MOCK_VILLAGE_GEOJSON.features.map((f) => f.properties!.district))
+    ),
+  ];
 
   return (
-    <Card className="h-full flex flex-col">
-      <Tabs defaultValue="controls" className="flex-1 flex flex-col">
-        <CardHeader>
-          <CardTitle>FRA Atlas Navigator</CardTitle>
-          <CardDescription>Analyze claims, layers, and assets.</CardDescription>
-          <TabsList className="grid w-full grid-cols-2 mt-4">
-            <TabsTrigger value="controls">
-              <Filter className="w-4 h-4 mr-2" />
-              Controls
-            </TabsTrigger>
-            <TabsTrigger value="data">
-              <List className="w-4 h-4 mr-2" />
-              Visible Data
-            </TabsTrigger>
-          </TabsList>
-        </CardHeader>
+    <Tabs defaultValue="controls" className="flex-1 flex flex-col">
+      <CardHeader>
+        <CardTitle>Atlas Navigator</CardTitle>
+        <CardDescription>Filter and explore FRA data.</CardDescription>
+        <TabsList className="grid w-full grid-cols-2 mt-4">
+          <TabsTrigger value="controls">
+            <Filter className="w-4 h-4 mr-2" />
+            Controls
+          </TabsTrigger>
+          <TabsTrigger value="data">
+            <List className="w-4 h-4 mr-2" />
+            Visible Data
+          </TabsTrigger>
+        </TabsList>
+      </CardHeader>
 
-        <TabsContent
-          value="controls"
-          className="flex-1 overflow-y-auto px-6 pb-6 space-y-6"
-        >
-          <form onSubmit={handleSearchSubmit} className="space-y-2">
-            <Label htmlFor="search">Search by Name / Claim ID</Label>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                id="search"
-                placeholder="e.g., CFR/101/XYZ..."
-                className="pl-10"
-                value={localQuery}
-                onChange={(e) => setLocalQuery(e.target.value)}
-              />
-            </div>
-          </form>
+      <TabsContent
+        value="controls"
+        className="flex-1 overflow-y-auto px-6 pb-6 space-y-6"
+      >
+        <form onSubmit={handleSearchSubmit} className="space-y-2">
+          <Label htmlFor="search">Search by Village Name</Label>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              id="search"
+              placeholder="e.g., Kondapuram..."
+              className="pl-10"
+              value={localQuery}
+              onChange={(e) => setLocalQuery(e.target.value)}
+            />
+          </div>
+        </form>
 
-          <Separator />
+        <Separator />
 
-          <Collapsible defaultOpen>
-            <CollapsibleTrigger className="flex justify-between items-center w-full font-semibold">
-              <span>
-                <Filter className="w-4 h-4 mr-2 inline-block" />
-                Filters
-              </span>
-              <ChevronDown className="w-4 h-4 transition-transform [&[data-state=open]]:rotate-180" />
-            </CollapsibleTrigger>
-            <CollapsibleContent className="space-y-4 pt-4">
-              <div className="space-y-2">
-                <Label htmlFor="district">District</Label>
-                <Select
-                  value={filters.district}
-                  onValueChange={(value) =>
-                    handleFilterChange("district", value)
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select District" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Districts</SelectItem>
-                    <SelectItem value="dehradun">Dehradun</SelectItem>
-                    <SelectItem value="haridwar">Haridwar</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="status">Status</Label>
-                <Select
-                  value={filters.status}
-                  onValueChange={(value) => handleFilterChange("status", value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Statuses</SelectItem>
-                    <SelectItem value="Approved">Approved</SelectItem>
-                    <SelectItem value="Pending">Pending</SelectItem>
-                    <SelectItem value="Rejected">Rejected</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>Claim Type</Label>
-                <Select
-                  value={filters.claimType}
-                  onValueChange={(value) =>
-                    handleFilterChange("claimType", value)
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select Type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Types</SelectItem>
-                    <SelectItem value="IFR">Individual (IFR)</SelectItem>
-                    <SelectItem value="CR">Community (CR)</SelectItem>
-                    <SelectItem value="CFR">Community Forest (CFR)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              {hasActiveFilters && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={resetFilters}
-                  className="w-full text-red-500 hover:bg-red-50"
-                >
-                  <X className="w-4 h-4 mr-2" />
-                  Reset Filters
-                </Button>
-              )}
-            </CollapsibleContent>
-          </Collapsible>
-
-          <Separator />
-
-          <Collapsible defaultOpen>
-            <CollapsibleTrigger className="flex justify-between items-center w-full font-semibold">
-              <span>
-                <Layers3 className="w-4 h-4 mr-2 inline-block" />
-                Data Layers
-              </span>
-              <ChevronDown className="w-4 h-4 transition-transform [&[data-state=open]]:rotate-180" />
-            </CollapsibleTrigger>
-            <CollapsibleContent className="space-y-4 pt-4">
-              <Label className="text-sm text-muted-foreground">Overlays</Label>
-              <div className="pl-2 space-y-3">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="claims"
-                    checked={layers.claims}
-                    onCheckedChange={(c) =>
-                      handleLayerChange("claims", c as boolean)
-                    }
-                  />
-                  <Label htmlFor="claims">FRA Claims</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="boundaries"
-                    checked={layers.boundaries}
-                    onCheckedChange={(c) =>
-                      handleLayerChange("boundaries", c as boolean)
-                    }
-                  />
-                  <Label htmlFor="boundaries">Village/Forest Boundaries</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="assets"
-                    checked={layers.assets}
-                    onCheckedChange={(c) =>
-                      handleLayerChange("assets", c as boolean)
-                    }
-                  />
-                  <Label htmlFor="assets">AI-Mapped Assets</Label>
-                </div>
-              </div>
-              <Label className="text-sm text-muted-foreground">Base Map</Label>
-              <Select
-                value={layers.baseLayer}
-                onValueChange={(value) =>
-                  handleBaseLayerChange(value as "street" | "satellite")
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="street">Topographic</SelectItem>
-                  <SelectItem value="satellite">Satellite Imagery</SelectItem>
-                </SelectContent>
-              </Select>
-            </CollapsibleContent>
-          </Collapsible>
-
-          <Separator />
-
+        {/* FILTERS */}
+        <div className="space-y-4">
+          <Label className="font-semibold">Filters</Label>
           <div className="space-y-2">
-            <Label className="font-semibold">Tools</Label>
-            <Button variant="outline" className="w-full justify-start">
-              <Download className="h-4 w-4 mr-2" /> Export View as GeoJSON
-            </Button>
+            <Label htmlFor="state" className="text-sm">
+              State
+            </Label>
+            <Select
+              value={filters.state}
+              onValueChange={(v) => handleFilterChange("state", v)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select State" />
+              </SelectTrigger>
+              <SelectContent>
+                {uniqueStates.map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {s === "all" ? "All States" : s}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-        </TabsContent>
-        <TabsContent value="data" className="flex-1 overflow-y-auto">
-          <Suspense fallback={<ClaimsListSkeleton />}>
-            <ClaimsListOnMap filters={filters} />
-          </Suspense>
-        </TabsContent>
-      </Tabs>
-    </Card>
-  );
-}
-
-// ############################################################################
-// 3. CLAIMS LIST ON MAP (Client Component)
-// ############################################################################
-const MOCK_CLAIMS_LIST = [
-  {
-    id: "CFR/101/DEH",
-    name: "Jaunpur Forest Reserve",
-    area: "150 Ha",
-    status: "Approved",
-    district: "dehradun",
-    type: "CFR",
-  },
-  {
-    id: "IFR/23/DEH",
-    name: "Ramesh Singh",
-    area: "2 Ha",
-    status: "Approved",
-    district: "dehradun",
-    type: "IFR",
-  },
-  {
-    id: "IFR/24/HAR",
-    name: "Sunita Devi",
-    area: "1.5 Ha",
-    status: "Pending",
-    district: "haridwar",
-    type: "IFR",
-  },
-  {
-    id: "CR/05/HAR",
-    name: "Chiriakhana Grazing Land",
-    area: "50 Ha",
-    status: "Rejected",
-    district: "haridwar",
-    type: "CR",
-  },
-];
-
-function ClaimsListOnMap({ filters }: { filters: Filters }) {
-  const [loading, setLoading] = useState(true);
-  const [claims, setClaims] = useState<typeof MOCK_CLAIMS_LIST>([]);
-
-  useEffect(() => {
-    setLoading(true);
-    // In a real app, you would fetch data from your API
-    console.log("Fetching claims with filters:", filters);
-    setTimeout(() => {
-      // Simulate network delay
-      const filteredClaims = MOCK_CLAIMS_LIST.filter((c) => {
-        if (filters.district !== "all" && c.district !== filters.district)
-          return false;
-        if (filters.status !== "all" && c.status !== filters.status)
-          return false;
-        if (filters.claimType !== "all" && c.type !== filters.claimType)
-          return false;
-        return true;
-      });
-      setClaims(filteredClaims);
-      setLoading(false);
-    }, 500);
-  }, [filters]);
-
-  if (loading) {
-    return <ClaimsListSkeleton />;
-  }
-
-  return (
-    <div className="p-4 space-y-2">
-      <div className="px-2 pb-2">
-        <h4 className="font-semibold">{claims.length} Claims in View</h4>
-        <p className="text-sm text-muted-foreground">
-          Click a claim to zoom on map
-        </p>
-      </div>
-      {claims.length > 0 ? (
-        claims.map((claim) => (
-          <Card
-            key={claim.id}
-            className="hover:bg-muted/50 cursor-pointer transition-colors"
+          <div className="space-y-2">
+            <Label htmlFor="district" className="text-sm">
+              District
+            </Label>
+            <Select
+              value={filters.district}
+              onValueChange={(v) => handleFilterChange("district", v)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select District" />
+              </SelectTrigger>
+              <SelectContent>
+                {uniqueDistricts.map((d) => (
+                  <SelectItem key={d} value={d}>
+                    {d === "all" ? "All Districts" : d}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={resetFilters}
+            className="w-full text-red-500 hover:bg-red-50"
           >
-            <CardContent className="p-3 flex justify-between items-center">
-              <div>
-                <p className="font-medium text-sm">{claim.name}</p>
-                <p className="text-xs text-muted-foreground">
-                  {claim.id} &bull; {claim.area}
-                </p>
-              </div>
-              <div
-                className={`text-xs font-semibold px-2 py-1 rounded-full ${
-                  claim.status === "Approved"
-                    ? "bg-green-100 text-green-800"
-                    : claim.status === "Pending"
-                    ? "bg-yellow-100 text-yellow-800"
-                    : "bg-red-100 text-red-800"
-                }`}
-              >
-                {claim.status}
-              </div>
-            </CardContent>
-          </Card>
-        ))
-      ) : (
-        <div className="text-center py-10">
-          <p className="text-muted-foreground">
-            No claims match the current filters.
-          </p>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ############################################################################
-// 4. MAIN MAP PAGE COMPONENT
-// This is the parent component that holds all the state.
-// ############################################################################
-export default function MapPage() {
-  const [filters, setFilters] = useState<Filters>({
-    query: "",
-    district: "all",
-    status: "all",
-    claimType: "all",
-  });
-
-  const [layers, setLayers] = useState<Layers>({
-    claims: true,
-    boundaries: true,
-    assets: false,
-    baseLayer: "street",
-  });
-
-  return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-6 space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">
-            WebGIS Mapping Platform
-          </h1>
-          <p className="text-lg text-muted-foreground">
-            Interactive atlas for Forest Rights Act (FRA) claims, assets, and
-            spatial analysis.
-          </p>
+            <X className="w-4 h-4 mr-2" /> Reset Filters
+          </Button>
         </div>
 
-        <div
-          className="grid grid-cols-1 lg:grid-cols-4 gap-6"
-          style={{ height: "calc(100vh - 160px)" }}
-        >
-          <div className="lg:col-span-1 h-full">
-            <Suspense fallback={<MapControlsSkeleton />}>
-              <MapControlsAndData
-                filters={filters}
-                setFilters={setFilters}
-                layers={layers}
-                setLayers={setLayers}
+        <Separator />
+
+        {/* LAYERS */}
+        <div className="space-y-4">
+          <Label className="font-semibold">Data Layers</Label>
+          <div className="pl-2 space-y-3">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="villages"
+                checked={layers.villages}
+                onCheckedChange={(c) =>
+                  handleLayerChange("villages", c as boolean)
+                }
               />
-            </Suspense>
+              <Label htmlFor="villages">FRA Villages</Label>
+            </div>
           </div>
-          <div className="lg:col-span-3 h-full">
-            <Card className="h-full shadow-md">
-              <CardContent className="p-0 h-full rounded-lg overflow-hidden">
-                <MapContainerWrapper filters={filters} layers={layers} />
-              </CardContent>
-            </Card>
-          </div>
+          <Label className="text-sm text-muted-foreground">Base Map</Label>
+          <Select
+            value={layers.baseLayer}
+            onValueChange={(v) => setLayers({ ...layers, baseLayer: v })}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="street">Topographic</SelectItem>
+              <SelectItem value="satellite">Satellite Imagery</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-      </div>
-    </div>
+      </TabsContent>
+      <TabsContent
+        value="data"
+        className="flex-1 overflow-y-auto p-4 space-y-2"
+      >
+        <h4 className="font-semibold px-2">
+          {filteredFeatures.length} Villages in View
+        </h4>
+        {filteredFeatures.length > 0 ? (
+          filteredFeatures.map(
+            ({ properties: p }: { properties: VillageProperties | null }) => (
+              <Card
+                key={p!.id}
+                className="hover:bg-muted/50 cursor-pointer transition-colors"
+              >
+                <CardContent className="p-3">
+                  <p className="font-medium text-sm">{p!.villageName}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {p!.district}, {p!.state}
+                  </p>
+                </CardContent>
+              </Card>
+            )
+          )
+        ) : (
+          <div className="text-center py-10">
+            <p className="text-muted-foreground">No villages match filters.</p>
+          </div>
+        )}
+      </TabsContent>
+    </Tabs>
   );
 }
 
-// ############################################################################
-// 5. LOADING SKELETONS
-// ############################################################################
-function MapControlsSkeleton() {
+// Feature Detail Panel Component
+function FeatureDetailPanel({
+  data,
+  onClose,
+}: {
+  data: VillageProperties;
+  onClose: () => void;
+}) {
   return (
-    <div className="p-6 space-y-6">
-      <div className="space-y-2">
-        <Skeleton className="h-5 w-40" />
-        <Skeleton className="h-4 w-56" />
-      </div>
-      <div className="flex space-x-2">
-        <Skeleton className="h-10 flex-1" />
-        <Skeleton className="h-10 flex-1" />
-      </div>
-      <div className="space-y-4 pt-4">
-        <Skeleton className="h-4 w-24" />
-        <Skeleton className="h-10 w-full" />
-      </div>
-      <div className="space-y-4">
-        <Skeleton className="h-4 w-20" />
-        <Skeleton className="h-10 w-full" />
-      </div>
-      <div className="space-y-4">
-        <Skeleton className="h-4 w-16" />
-        <div className="space-y-2">
-          <Skeleton className="h-8 w-full" />
-          <Skeleton className="h-8 w-full" />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ClaimsListSkeleton() {
-  return (
-    <div className="space-y-3 p-4">
-      <div className="flex justify-between items-center">
-        <Skeleton className="h-5 w-32" />
-        <Skeleton className="h-4 w-20" />
-      </div>
-      {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className="flex items-center space-x-4 p-2">
-          <div className="space-y-2 flex-1">
-            <Skeleton className="h-4 w-3/4" />
-            <Skeleton className="h-3 w-1/2" />
+    <div className="flex flex-col h-full">
+      <CardHeader className="relative">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute top-4 right-4 h-6 w-6"
+          onClick={onClose}
+        >
+          <X className="h-4 w-4" />
+        </Button>
+        <CardTitle>{data.villageName}</CardTitle>
+        <CardDescription>
+          {data.district}, {data.state}
+        </CardDescription>
+      </CardHeader>
+      <div className="flex-1 overflow-y-auto px-6 pb-6 space-y-6">
+        {/* Key Stats */}
+        <div className="grid grid-cols-2 gap-4 text-center">
+          <div className="bg-muted/50 p-3 rounded-lg">
+            <p className="text-sm text-muted-foreground">Population</p>
+            <p className="text-lg font-bold">
+              {data.population.toLocaleString()}
+            </p>
           </div>
-          <Skeleton className="h-6 w-16 rounded-full" />
+          <div className="bg-muted/50 p-3 rounded-lg">
+            <p className="text-sm text-muted-foreground">Tribal Pop.</p>
+            <p className="text-lg font-bold">
+              {data.tribalPopulation.toLocaleString()}
+            </p>
+          </div>
+          <div className="bg-muted/50 p-3 rounded-lg">
+            <p className="text-sm text-muted-foreground">IFR Pattas</p>
+            <p className="text-lg font-bold">{data.ifrPattas}</p>
+          </div>
+          <div className="bg-muted/50 p-3 rounded-lg">
+            <p className="text-sm text-muted-foreground">CFR Pattas</p>
+            <p className="text-lg font-bold">{data.cfrPattas}</p>
+          </div>
         </div>
-      ))}
+
+        <Separator />
+
+        {/* Assets Overview */}
+        <div>
+          <h4 className="font-semibold mb-3">
+            <Building2 className="w-4 h-4 mr-2 inline-block" /> Assets Overview
+          </h4>
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span className="flex items-center text-muted-foreground">
+                <TreePine className="w-4 h-4 mr-2" />
+                Forest Cover:
+              </span>
+              <span className="font-medium">
+                {data.assets.forestCoverHa} Ha
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="flex items-center text-muted-foreground">
+                <Info className="w-4 h-4 mr-2" />
+                Agricultural Land:
+              </span>
+              <span className="font-medium">
+                {data.assets.agriculturalLandHa} Ha
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="flex items-center text-muted-foreground">
+                <Droplets className="w-4 h-4 mr-2" />
+                Water Bodies:
+              </span>
+              <span className="font-medium">{data.assets.waterBodies}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="flex items-center text-muted-foreground">
+                <Home className="w-4 h-4 mr-2" />
+                Homesteads:
+              </span>
+              <span className="font-medium">{data.assets.homesteads}</span>
+            </div>
+          </div>
+        </div>
+
+        <Separator />
+
+        {/* Eligible Schemes */}
+        <div>
+          <h4 className="font-semibold mb-3">
+            <CheckCircle2 className="w-4 h-4 mr-2 inline-block" /> Eligible
+            Schemes
+          </h4>
+          <div className="flex flex-wrap gap-2">
+            {data.eligibleSchemes.map((scheme) => (
+              <div
+                key={scheme}
+                className="text-xs font-medium bg-blue-100 text-blue-800 px-2.5 py-1 rounded-full"
+              >
+                {scheme}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <Separator />
+
+        {/* Priority Interventions */}
+        <div>
+          <h4 className="font-semibold mb-3">
+            <Target className="w-4 h-4 mr-2 inline-block" /> Priority
+            Interventions
+          </h4>
+          <div className="flex flex-wrap gap-2">
+            {data.priorityInterventions.map((item) => (
+              <div
+                key={item}
+                className="text-xs font-medium bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full"
+              >
+                {item}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
