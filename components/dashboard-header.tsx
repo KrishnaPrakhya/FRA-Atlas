@@ -106,7 +106,7 @@ export function DashboardHeader() {
             </div>
             <div className={`${scrolled ? "hidden" : "block"} transition-all`}>
               <span className="font-bold text-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 bg-clip-text text-transparent">
-                FRA Atlas
+                Van-समर्थन
               </span>
               <p className="text-xs text-gray-600 dark:text-gray-400 -mt-1 flex items-center space-x-1">
                 <Leaf className="h-3 w-3 text-emerald-500" />

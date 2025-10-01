@@ -669,7 +669,7 @@ export default function HomePage() {
               {/* Copyright */}
               <div className="pt-8 text-emerald-200/60">
                 <p className="text-sm">
-                  © 2024 FRA Atlas. Empowering sustainable forest management
+                  © 2025 FRA Atlas. Empowering sustainable forest management
                   worldwide.
                 </p>
               </div>
