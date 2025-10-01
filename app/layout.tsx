@@ -26,8 +26,8 @@ export default function RootLayout({
     <html lang="en">
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
         <ReduxProvider>
+          <DashboardHeader />
           <ErrorBoundary>
-            <DashboardHeader />
             <Suspense fallback={null}>{children}</Suspense>
             <Toaster position="top-right" />
           </ErrorBoundary>
