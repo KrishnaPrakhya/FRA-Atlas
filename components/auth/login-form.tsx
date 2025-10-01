@@ -65,7 +65,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
           <span className="text-white font-bold text-2xl">🌲</span>
         </div>
         <CardTitle className="text-2xl font-bold text-gray-900">
-          Sign In to FRA Atlas
+          Sign In to Van-समर्थन
         </CardTitle>
         <CardDescription className="text-gray-600 mt-2">
           Access the Forest Rights Act management system
@@ -168,7 +168,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
         {/* Additional Info */}
         <div className="mt-8 pt-6 border-t border-gray-200">
           <div className="text-center text-sm text-gray-600">
-            <p>New to FRA Atlas?</p>
+            <p>New to Van-समर्थन ?</p>
             <Button
               variant="link"
               className="text-green-600 hover:text-green-800 font-medium p-0 h-auto"
