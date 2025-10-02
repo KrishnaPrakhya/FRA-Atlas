@@ -45,7 +45,8 @@ def main():
             "easyocr==1.7.0",
             "opencv-python==4.8.1.78",
             "Pillow==10.1.0",
-            "spacy==3.7.2"
+            "spacy==3.7.2",
+            "pandas==2.0.3"
         ]
         
         optional_packages = [
@@ -61,6 +62,12 @@ def main():
             if not run_command(f"pip install {package}", f"Installing {package}"):
                 print(f"⚠️  Optional package {package} failed to install. Some features may be limited.")
     
+    # Apply EasyOCR patch for Pillow compatibility
+    print("\n🩹 Applying EasyOCR patch...")
+    patch_script_path = Path(__file__).parent / "fix_easyocr.py"
+    if not run_command(f"python {patch_script_path}", "Patching EasyOCR for Pillow 10.x"):
+        print("⚠️  EasyOCR patch failed to apply. The application may not run correctly.")
+
     # Install spaCy language model
     print("\n📚 Installing spaCy language model...")
     if not run_command("python -m spacy download en_core_web_sm", "Installing English language model"):
