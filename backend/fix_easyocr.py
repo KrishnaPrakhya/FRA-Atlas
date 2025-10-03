@@ -4,14 +4,18 @@ the new Resampling.LANCZOS constant.
 """
 import os
 from pathlib import Path
+import sys
 
 def fix_easyocr_antialias():
-    # Get the site-packages directory
-    site_packages = str(Path(__file__).parent / '.venv' / 'Lib' / 'site-packages')
-    
-    # Path to the utils.py file in easyocr
-    utils_path = Path(site_packages) / 'easyocr' / 'utils.py'
-    
+    try:
+        import easyocr
+        # Find the path to the easyocr library
+        easyocr_path = Path(easyocr.__file__).parent
+        utils_path = easyocr_path / 'utils.py'
+    except ImportError:
+        print("Error: easyocr is not installed. Please run install.py first.")
+        return False
+
     if not utils_path.exists():
         print(f"Error: Could not find EasyOCR utils.py at {utils_path}")
         return False
@@ -21,6 +25,7 @@ def fix_easyocr_antialias():
     
     # Replace ANTIALIAS with Resampling.LANCZOS
     if 'Image.ANTIALIAS' in content:
+        # In Pillow V10, ANTIALIAS is changed to Resampling.LANCZOS
         content = content.replace(
             'Image.ANTIALIAS',
             'Image.Resampling.LANCZOS'
