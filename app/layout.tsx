@@ -11,10 +11,13 @@ import "./globals.css";
 import { DashboardHeader } from "@/components/dashboard-header";
 
 export const metadata: Metadata = {
-  title: "FRA Atlas - Forest Rights Act Management System",
+  title: "Van-समर्थन - Forest Rights Act Management System",
   description:
     "Comprehensive digital platform for managing forest rights claims, document verification, and spatial data analysis",
   generator: "v0.app",
+  icons: {
+    icon: "/tree.svg",
+  },
 };
 
 export default function RootLayout({
